@@ -15,18 +15,21 @@ struct ContentView: View {
     }
     
     @State private var selectedItem: PhotosPickerItem? = nil
-    @State private var selectedImage: Image? = nil
+    @State private var treeStore: TreeStore = .init()
 
     var body: some View {
         let cornerRadius = Constants.cornerRadius
 
         VStack {
-            if let image = selectedImage {
-                image
+            if let tree = treeStore.trees.first {
+                Image(uiImage: tree.image)
                     .resizable()
                     .scaledToFit()
                     .frame(height: 200)
                     .cornerRadius(cornerRadius)
+
+                Text("Name: \(tree.name)")
+                Text("Confidence: \(tree.confidence)")
             }
 
             PhotosPicker(
@@ -34,19 +37,18 @@ struct ContentView: View {
                 matching: .images,
                 photoLibrary: .shared()
             ) {
-                Label("Pick a Photo", systemImage: "photo")
+                Label("", systemImage: "photo")
                     .padding()
                     .background(Color.blue)
                     .foregroundStyle(.white)
                     .cornerRadius(cornerRadius)
             }
             .onChange(of: selectedItem) { oldItem, newItem in
+                // TODO: abstract to separate handler
                 Task {
                     if let data = try? await newItem?.loadTransferable(type: Data.self),
                        let uiImage = UIImage(data: data) {
-                        selectedImage = Image(uiImage: uiImage)
-                    } else {
-                        selectedImage = nil
+                        treeStore.addTree(for: uiImage)
                     }
                 }
             }
