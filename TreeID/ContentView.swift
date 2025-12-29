@@ -21,15 +21,19 @@ struct ContentView: View {
         let cornerRadius = Constants.cornerRadius
 
         VStack {
-            if let tree = treeStore.trees.first {
-                Image(uiImage: tree.image)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 200)
-                    .cornerRadius(cornerRadius)
-
-                Text("Name: \(tree.name)")
-                Text("Confidence: \(tree.confidence)")
+            if treeStore.trees.isEmpty == false {
+                List {
+                    ForEach(treeStore.trees) { tree in
+                        Image(uiImage: tree.image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 200)
+                            .cornerRadius(cornerRadius)
+                        
+                        Text("Name: \(tree.name)")
+                        Text("Confidence: \(tree.confidence)")
+                    }
+                }
             }
 
             PhotosPicker(

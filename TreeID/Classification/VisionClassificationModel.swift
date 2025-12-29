@@ -10,7 +10,7 @@ import Vision
 
 struct VisionClassificationModel: ClassificationModelable {
 
-    func classify(image: UIImage) async -> ClassificationResult? {
+    func classify(image: UIImage) async -> [ClassificationResult]? {
         guard let data = image.pngData() else {
             return nil
         }
@@ -24,10 +24,12 @@ struct VisionClassificationModel: ClassificationModelable {
                     $0.hasMinimumPrecision(0.1, forRecall: 0.8)
                 }
 
-            guard let bestResult = results.first else {
+            guard results.isEmpty == false else {
                 return nil
             }
-            return .init(label: bestResult.identifier, confidence: Double(bestResult.confidence))
+            return results.compactMap {
+                .init(label: $0.identifier, confidence: Double($0.confidence))
+            }
         }
         catch {
             print("Image classification error: \(error)")
