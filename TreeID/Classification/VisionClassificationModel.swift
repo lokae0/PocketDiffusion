@@ -8,30 +8,43 @@
 import UIKit
 import Vision
 
-struct VisionClassificationModel: ClassificationModelable {
+struct VisionClassificationModel: ClassificationModeling {
 
     func classify(image: UIImage) async -> [ClassificationResult]? {
-        guard let data = image.pngData() else {
+        guard let cgImage = image.cgImage else {
             return nil
         }
-        var request = ClassifyImageRequest()
-        request.cropAndScaleAction = .centerCrop
 
         do {
-            let results = try await request.perform(on: data)
-                .filter {
-                    // Only include classifications that meet a minimum precision and recall threshold
-                    $0.hasMinimumPrecision(0.1, forRecall: 0.8)
-                }
+            let mlModel = try INatVisionClassifier(configuration: .init()).model
+            let visionModel = try VNCoreMLModel(for: mlModel)
 
-            guard results.isEmpty == false else {
+            var results: [VNClassificationObservation] = []
+            let request = VNCoreMLRequest(
+                model: visionModel,
+                completionHandler: { request, error in
+                    guard let requestResults = request.results as? [VNClassificationObservation] else {
+                        // TODO: throw error
+                        return
+                    }
+                    results = requestResults.filter {
+                        // Only include classifications that meet a minimum precision and recall threshold
+                        $0.hasMinimumPrecision(0.1, forRecall: 0.8)
+                    }
+                })
+            request.imageCropAndScaleOption = .centerCrop
+
+            let handler = VNImageRequestHandler(cgImage: cgImage)
+            try handler.perform([request])
+
+            if results.isEmpty == false {
+                return results.compactMap {
+                    .init(label: $0.identifier, confidence: Double($0.confidence))
+                }
+            } else {
                 return nil
             }
-            return results.compactMap {
-                .init(label: $0.identifier, confidence: Double($0.confidence))
-            }
-        }
-        catch {
+        } catch {
             print("Image classification error: \(error)")
             return nil
         }
