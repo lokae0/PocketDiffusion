@@ -14,25 +14,29 @@ struct ContentView: View {
         static let cornerRadius: CGFloat = 16.0
     }
 
-    @State private var imageStore: ImageStore = .init()
+    @State private var imageStore: GeneratedImageStore = .init()
 
     var body: some View {
         let cornerRadius = Constants.cornerRadius
 
         VStack {
-            if imageStore.trees.isEmpty == false {
+            if imageStore.generatedImages.isEmpty == false {
                 List {
-                    ForEach(imageStore.trees) { tree in
-                        Image(uiImage: tree.image)
+                    ForEach(imageStore.generatedImages) { generatedImage in
+                        Image(uiImage: generatedImage.uiImage)
                             .resizable()
                             .scaledToFit()
                             .frame(height: 200)
                             .cornerRadius(cornerRadius)
                         
-                        Text("Name: \(tree.name)")
-                        Text("Confidence: \(tree.confidence)")
+//                        Text("Name: \(tree.name)")
+//                        Text("Confidence: \(tree.confidence)")
                     }
                 }
+            }
+
+            Button("Generate", role: nil) {
+                imageStore.handle(prompt: "abc", negatives: "aaa")
             }
         }
     }

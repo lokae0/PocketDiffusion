@@ -5,11 +5,12 @@
 //  Created by Ian Luo on 1/6/26.
 //
 
+import CoreImage
 import Foundation
 import StableDiffusion
 
 protocol Generating {
-    func generate()
+    func generate() -> CGImage?
 }
 
 class Generator: Generating {
@@ -36,7 +37,24 @@ class Generator: Generating {
         }
     }
 
-    func generate() {
+    func generate() -> CGImage? {
+        var config = StableDiffusionPipeline.Configuration(prompt: "big chungus")
+//        config.negativePrompt = negativePrompt
+        config.stepCount = 25
+        config.guidanceScale = 11
+        config.seed = 475530781
+        config.schedulerType = .dpmSolverMultistepScheduler
 
+        // TODO: handle errors
+        let images = try! pipeline.generateImages(configuration: config) { progress in
+            print(progress.step)
+            return true
+        }
+        print("Got images: \(images)")
+
+        // Unwrap the 1 image we asked for, nil means safety checker triggered
+        return images
+            .compactMap { $0 }
+            .first
     }
 }
