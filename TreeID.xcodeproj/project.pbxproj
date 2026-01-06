@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3EF349EC2F0D079C005720F2 /* StableDiffusion in Frameworks */ = {isa = PBXBuildFile; productRef = 3EF349EB2F0D079C005720F2 /* StableDiffusion */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		3ED3E7912ED66A190056FC4A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -32,6 +36,9 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3ED3E7832ED66A190056FC4A /* TreeID */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			explicitFolders = (
+				Resources/StableDiffusionModel,
+			);
 			path = TreeID;
 			sourceTree = "<group>";
 		};
@@ -52,6 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3EF349EC2F0D079C005720F2 /* StableDiffusion in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +120,7 @@
 			);
 			name = TreeID;
 			packageProductDependencies = (
+				3EF349EB2F0D079C005720F2 /* StableDiffusion */,
 			);
 			productName = TreeID;
 			productReference = 3ED3E7812ED66A190056FC4A /* TreeID.app */;
@@ -195,6 +204,9 @@
 			);
 			mainGroup = 3ED3E7782ED66A190056FC4A;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				3EF349EA2F0D079C005720F2 /* XCRemoteSwiftPackageReference "ml-stable-diffusion" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3ED3E7822ED66A190056FC4A /* Products */;
 			projectDirPath = "";
@@ -621,6 +633,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3EF349EA2F0D079C005720F2 /* XCRemoteSwiftPackageReference "ml-stable-diffusion" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/ml-stable-diffusion";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3EF349EB2F0D079C005720F2 /* StableDiffusion */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3EF349EA2F0D079C005720F2 /* XCRemoteSwiftPackageReference "ml-stable-diffusion" */;
+			productName = StableDiffusion;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3ED3E7792ED66A190056FC4A /* Project object */;
 }
