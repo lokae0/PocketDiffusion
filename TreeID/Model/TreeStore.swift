@@ -15,7 +15,8 @@ class TreeStore {
 
     func addTree(for image: UIImage) {
         Task {
-            guard let classifications = await classificationModel.classify(image: image) else {
+            let classifications = await classificationModel.classify(image: image)
+            guard !classifications.isEmpty else {
                 return
             }
             trees = classifications.map {

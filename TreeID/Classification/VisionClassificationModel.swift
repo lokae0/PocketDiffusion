@@ -10,11 +10,10 @@ import Vision
 
 struct VisionClassificationModel: ClassificationModeling {
 
-    func classify(image: UIImage) async -> [ClassificationResult]? {
+    func classify(image: UIImage) async -> [ClassificationResult] {
         guard let cgImage = image.cgImage else {
-            return nil
+            return []
         }
-
         do {
             let mlModel = try INatVisionClassifier(configuration: .init()).model
             let visionModel = try VNCoreMLModel(for: mlModel)
@@ -27,26 +26,21 @@ struct VisionClassificationModel: ClassificationModeling {
                         // TODO: throw error
                         return
                     }
-                    results = requestResults.filter {
-                        // Only include classifications that meet a minimum precision and recall threshold
-                        $0.hasMinimumPrecision(0.1, forRecall: 0.8)
-                    }
+                    results = requestResults
                 })
             request.imageCropAndScaleOption = .centerCrop
 
             let handler = VNImageRequestHandler(cgImage: cgImage)
             try handler.perform([request])
 
-            if results.isEmpty == false {
-                return results.compactMap {
+            return results
+                .prefix(10)
+                .compactMap {
                     .init(label: $0.identifier, confidence: Double($0.confidence))
                 }
-            } else {
-                return nil
-            }
         } catch {
-            print("Image classification error: \(error)")
-            return nil
+            print("Vision classification error: \(error)")
+            return []
         }
     }
 }

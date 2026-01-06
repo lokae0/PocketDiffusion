@@ -14,5 +14,5 @@ struct ClassificationResult {
 
 protocol ClassificationModeling {
 
-    func classify(image: UIImage) async -> [ClassificationResult]?
+    func classify(image: UIImage) async -> [ClassificationResult]
 }
