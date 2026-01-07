@@ -5,13 +5,17 @@
 //  Created by Ian Luo on 12/26/25.
 //
 
-import Foundation
 import UIKit
 
-@Observable
-final class GeneratedImageStore {
+protocol GeneratedImageStoring {
+    var generatedImages: [GeneratedImage] { get }
+    func handle(prompt: String, negativePrompt: String) async
+}
 
-    var generatedImages: [GeneratedImage] = []
+@Observable
+final class GeneratedImageStore: GeneratedImageStoring {
+
+    private(set) var generatedImages: [GeneratedImage] = []
     private let imageGenerator: any Generating
 
     init(imageGenerator: any Generating = ImageGenerator()) {
@@ -32,4 +36,3 @@ final class GeneratedImageStore {
         )
     }
 }
-

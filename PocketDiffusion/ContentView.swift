@@ -6,59 +6,53 @@
 //
 
 import SwiftUI
-import PhotosUI
 
 struct ContentView: View {
 
-    private enum UI {
-        static let cornerRadius: CGFloat = 16.0
+    enum TabType: CaseIterable, Identifiable {
+        case imageGeneration
+        case imageGallery
 
-        enum Spacing {
-            static let medium: CGFloat = 16.0
-            static let large: CGFloat = 32.0
+        var label: String {
+            switch self {
+            case .imageGeneration: "Generate"
+            case .imageGallery: "Gallery"
+            }
         }
+
+        var systemImage: String {
+            switch self {
+            case .imageGeneration: "wand.and.sparkles"
+            case .imageGallery: "photo.on.rectangle"
+            }
+        }
+
+        @ViewBuilder
+        func view(with imageStore: Binding<GeneratedImageStoring>) -> some View {
+            switch self {
+            case .imageGeneration: ImageGenerationView(imageStore: imageStore)
+            case .imageGallery: ImageGalleryView(imageStore: imageStore)
+            }
+        }
+
+        var id: Self { self }
     }
 
-    @State private var imageStore: GeneratedImageStore = .init()
-    @State private var prompt: String = ""
-    @State private var negativePrompt: String = ""
+    @State private var imageStore: GeneratedImageStoring = GeneratedImageStore()
+    @State private var selectedTab: TabType = .imageGeneration
 
     var body: some View {
-        let cornerRadius = UI.cornerRadius
-
-        VStack(spacing: UI.Spacing.medium) {
-            TextField("Prompt", text: $prompt)
-            TextField("Negative Prompt", text: $negativePrompt)
-
-            if imageStore.generatedImages.isEmpty == false {
-                List {
-                    ForEach(imageStore.generatedImages) { generatedImage in
-                        Image(uiImage: generatedImage.uiImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 200)
-                            .cornerRadius(cornerRadius)
-                        
-//                        Text("Name: \(tree.name)")
-//                        Text("Confidence: \(tree.confidence)")
-                    }
+        TabView(selection: $selectedTab) {
+            ForEach(TabType.allCases) { type in
+                Tab(
+                    type.label,
+                    systemImage: type.systemImage,
+                    value: type
+                ) {
+                    type.view(with: $imageStore)
                 }
-            }
-
-            Button("Generate", role: nil) {
-                Task {
-                    Log.shared.currentThread(for: "Button Task started")
-                    Timer.shared.startTimer(type: .modelLoading)
-
-                    await imageStore.handle(
-                        prompt: prompt,
-                        negativePrompt: negativePrompt
-                    )
-                }
-                Log.shared.currentThread(for: "Button closure end")
             }
         }
-        .padding(UI.Spacing.large)
     }
 }
 
