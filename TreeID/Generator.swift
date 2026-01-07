@@ -10,7 +10,7 @@ import Foundation
 import StableDiffusion
 
 protocol Generating {
-    func generate() -> CGImage?
+    func generate(prompt: String, negativePrompt: String) -> CGImage?
 }
 
 class Generator: Generating {
@@ -24,7 +24,7 @@ class Generator: Generating {
             fatalError(loadErrorMessage)
         }
         do {
-            pipeline = try .init(
+            self.pipeline = try .init(
                 resourcesAt: modelUrl,
                 controlNet: [],
                 disableSafety: true,
@@ -37,12 +37,12 @@ class Generator: Generating {
         }
     }
 
-    func generate() -> CGImage? {
-        var config = StableDiffusionPipeline.Configuration(prompt: "big chungus")
-//        config.negativePrompt = negativePrompt
+    func generate(prompt: String, negativePrompt: String) -> CGImage? {
+        var config = StableDiffusionPipeline.Configuration(prompt: prompt)
+        config.negativePrompt = negativePrompt
         config.stepCount = 25
         config.guidanceScale = 11
-        config.seed = 475530781
+        config.seed = UInt32.random(in: 0..<UInt32.max)
         config.schedulerType = .dpmSolverMultistepScheduler
 
         // TODO: handle errors

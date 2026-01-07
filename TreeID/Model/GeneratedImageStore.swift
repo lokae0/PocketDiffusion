@@ -18,8 +18,11 @@ class GeneratedImageStore {
         self.generator = generator
     }
 
-    func handle(prompt: String, negatives: String) {
-        guard let cgImage = generator.generate() else {
+    func handle(prompt: String, negativePrompt: String) {
+        guard let cgImage = generator.generate(
+            prompt: prompt,
+            negativePrompt: negativePrompt
+        ) else {
             return
         }
         generatedImages.append(
