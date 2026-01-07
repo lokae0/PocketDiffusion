@@ -46,10 +46,16 @@ struct ContentView: View {
             }
 
             Button("Generate", role: nil) {
-                imageStore.handle(
-                    prompt: prompt,
-                    negativePrompt: negativePrompt
-                )
+                Task {
+                    Log.shared.currentThread(for: "Button Task started")
+                    Timer.shared.startTimer(type: .modelLoading)
+
+                    await imageStore.handle(
+                        prompt: prompt,
+                        negativePrompt: negativePrompt
+                    )
+                }
+                Log.shared.currentThread(for: "Button closure end")
             }
         }
         .padding(UI.Spacing.large)

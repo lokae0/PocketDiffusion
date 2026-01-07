@@ -9,24 +9,26 @@ import Foundation
 import UIKit
 
 @Observable
-class GeneratedImageStore {
+final class GeneratedImageStore {
 
     var generatedImages: [GeneratedImage] = []
-    private let generator: Generating
+    private let imageGenerator: any Generating
 
-    init(generator: Generating = Generator()) {
-        self.generator = generator
+    init(imageGenerator: any Generating = ImageGenerator()) {
+        self.imageGenerator = imageGenerator
     }
 
-    func handle(prompt: String, negativePrompt: String) {
-        guard let cgImage = generator.generate(
+    func handle(prompt: String, negativePrompt: String) async {
+        guard let uiImage = await imageGenerator.generate(
             prompt: prompt,
             negativePrompt: negativePrompt
-        ) else {
+        ) as? UIImage else {
             return
         }
+        Timer.shared.stopTimer(type: .imageGeneration)
+
         generatedImages.append(
-            .init(uiImage: .init(cgImage: cgImage))
+            .init(uiImage: uiImage)
         )
     }
 }
