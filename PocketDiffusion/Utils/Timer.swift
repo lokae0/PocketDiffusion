@@ -5,6 +5,7 @@
 //  Created by Ian Luo on 1/6/26.
 //
 
+import Foundation
 import StableDiffusion
 
 // TODO: implement swift-dependencies for DI
@@ -31,12 +32,15 @@ final class Timer {
     private static let loadingTimer = SampleTimer()
     private static let generationTimer = SampleTimer()
 
-    func startTimer(type: Type) {
+    func startTimer(type: Type, shouldLog: Bool = true) {
         switch type {
         case .modelLoading:
             Self.loadingTimer.start()
         case .imageGeneration:
             Self.generationTimer.start()
+        }
+        if shouldLog {
+            Log.shared.info("\(type.label) timer started")
         }
     }
 
@@ -52,7 +56,8 @@ final class Timer {
         }
 
         if shouldLog {
-            Log.shared.info("\(type.label) duration: \(duration)s")
+            let formatString = String(format: "%.2f", arguments: [duration])
+            Log.shared.info("\(type.label) duration: \(formatString)s")
         }
         return duration
     }

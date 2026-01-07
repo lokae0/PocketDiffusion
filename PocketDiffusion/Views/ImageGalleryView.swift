@@ -8,7 +8,7 @@
 import SwiftUI
 
 private extension UI {
-    static let itemHeight: CGFloat = 200.0
+    static let imageHeight: CGFloat = 200.0
 }
 
 struct ImageGalleryView: View {
@@ -16,14 +16,14 @@ struct ImageGalleryView: View {
     @Binding var imageStore: GeneratedImageStoring
 
     var body: some View {
-        if imageStore.generatedImages.isEmpty == false {
+        if imageStore.storedImages.isEmpty == false {
             List {
-                ForEach(imageStore.generatedImages) { generatedImage in
-                    Image(uiImage: generatedImage.uiImage)
+                ForEach(imageStore.storedImages) { storedImage in
+                    Image(uiImage: storedImage.uiImage)
                         .resizable()
                         .scaledToFit()
-                        .frame(height: UI.itemHeight)
                         .cornerRadius(UI.cornerRadius)
+                        .frame(height: UI.imageHeight)
                 }
             }
         }

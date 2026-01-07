@@ -8,31 +8,43 @@
 import UIKit
 
 protocol GeneratedImageStoring {
-    var generatedImages: [GeneratedImage] { get }
-    func handle(prompt: String, negativePrompt: String) async
+    var currentGeneration: GeneratedImage? { get set }
+    var storedImages: [GeneratedImage] { get }
+    func handle(prompt: String, negativePrompt: String)
 }
 
 @Observable
-final class GeneratedImageStore: GeneratedImageStoring {
+final class GeneratedImageStore<Generator: Generating>: GeneratedImageStoring {
 
-    private(set) var generatedImages: [GeneratedImage] = []
-    private let imageGenerator: any Generating
+    var currentGeneration: GeneratedImage?
+    private(set) var storedImages: [GeneratedImage] = []
+    private let imageGenerator: Generator
 
-    init(imageGenerator: any Generating = ImageGenerator()) {
+    init(imageGenerator: Generator = ImageGenerator()) {
         self.imageGenerator = imageGenerator
     }
 
-    func handle(prompt: String, negativePrompt: String) async {
-        guard let uiImage = await imageGenerator.generate(
-            prompt: prompt,
-            negativePrompt: negativePrompt
-        ) as? UIImage else {
-            return
-        }
-        Timer.shared.stopTimer(type: .imageGeneration)
+    func handle(prompt: String, negativePrompt: String) {
+        Task {
+            for await generated in await imageGenerator.generate(
+                prompt: prompt,
+                negativePrompt: negativePrompt
+            ) {
+                guard let uiImage = generated as? UIImage else {
+                    Log.shared.info("Unexpected type for generated image!!")
+                    continue
+                }
+                Log.shared.currentThread(
+                    for: "Setting currentGeneration",
+                    isEnabled: false
+                )
+                currentGeneration = GeneratedImage(uiImage: uiImage)
+            }
 
-        generatedImages.append(
-            .init(uiImage: uiImage)
-        )
+            if let gen = currentGeneration {
+                storedImages.append(gen)
+            }
+            Timer.shared.stopTimer(type: .imageGeneration)
+        }
     }
 }

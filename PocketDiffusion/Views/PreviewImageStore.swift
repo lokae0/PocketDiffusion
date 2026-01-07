@@ -14,13 +14,15 @@ private extension UI {
 @Observable
 final class PreviewImageStore: GeneratedImageStoring {
 
-    var generatedImages: [GeneratedImage] = [
+    var currentGeneration: GeneratedImage? = .init(uiImage: image(color: .gray))
+
+    var storedImages: [GeneratedImage] = [
         .init(uiImage: image(color: .darkGray)),
         .init(uiImage: image(color: .lightGray)),
         .init(uiImage: image(color: .gray)),
     ]
 
-    func handle(prompt: String, negativePrompt: String) async {}
+    func handle(prompt: String, negativePrompt: String) {}
 
     private static func image(color: UIColor) -> UIImage {
         let size = CGSize(width: UI.imageSize, height: UI.imageSize)

@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+private extension UI {
+    static let imageHeight: CGFloat = 512.0
+}
+
 struct ImageGenerationView: View {
 
     @Binding var imageStore: GeneratedImageStoring
@@ -16,20 +20,24 @@ struct ImageGenerationView: View {
 
     var body: some View {
         VStack(spacing: UI.Spacing.medium) {
+            if let image = imageStore.currentGeneration?.uiImage {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .cornerRadius(UI.cornerRadius)
+                    .frame(height: UI.imageHeight)
+            }
+
             TextField("Prompt", text: $prompt)
             TextField("Negative Prompt", text: $negativePrompt)
 
             Button("Generate", role: nil) {
-                Task {
-                    Log.shared.currentThread(for: "Button Task started")
-                    Timer.shared.startTimer(type: .modelLoading)
+                Timer.shared.startTimer(type: .modelLoading)
 
-                    await imageStore.handle(
-                        prompt: prompt,
-                        negativePrompt: negativePrompt
-                    )
-                }
-                Log.shared.currentThread(for: "Button closure end")
+                imageStore.handle(
+                    prompt: prompt,
+                    negativePrompt: negativePrompt
+                )
             }
         }
         .padding(UI.Spacing.large)

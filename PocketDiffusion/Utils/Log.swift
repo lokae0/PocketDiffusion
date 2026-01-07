@@ -12,18 +12,27 @@ nonisolated final class Log: Sendable {
 
     static let shared = Log()
 
+    private var currentTime: String {
+        let currentDate = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeStyle = .medium
+        return dateFormatter.string(from: currentDate)
+    }
+
     private init() {}
 
     func info(_ message: String) {
-        print(message)
+        print("\(currentTime) \(message)")
     }
 
     func fatal(_ message: String) -> Never {
-        fatalError(message)
+        fatalError("\(currentTime) \(message)")
     }
 
-    func currentThread(for event: String) {
-        print("\(event) on: \(Thread.current)")
+    func currentThread(for event: String, isEnabled: Bool = true) {
+        if isEnabled {
+            print("\(currentTime) \(event) on: \(Thread.current)")
+        }
     }
 }
 
