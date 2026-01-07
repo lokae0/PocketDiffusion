@@ -1,6 +1,6 @@
 //
-//  Generator.swift
-//  TreeID
+//  ImageGenerator.swift
+//  PocketDiffusion
 //
 //  Created by Ian Luo on 1/6/26.
 //
@@ -90,3 +90,4 @@ final actor ImageGenerator: Generating {
         try pipeline.prewarmResources()
     }
 }
+

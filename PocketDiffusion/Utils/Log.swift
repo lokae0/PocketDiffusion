@@ -1,6 +1,6 @@
 //
 //  Logger.swift
-//  TreeID
+//  PocketDiffusion
 //
 //  Created by Ian Luo on 1/6/26.
 //
@@ -26,3 +26,4 @@ nonisolated final class Log: Sendable {
         print("\(event) on: \(Thread.current)")
     }
 }
+

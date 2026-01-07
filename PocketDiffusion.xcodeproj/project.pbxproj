@@ -28,28 +28,23 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		3ED3E7812ED66A190056FC4A /* TreeID.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TreeID.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		3ED3E7902ED66A190056FC4A /* TreeIDTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TreeIDTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		3ED3E79A2ED66A190056FC4A /* TreeIDUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TreeIDUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3ED3E7812ED66A190056FC4A /* PocketDiffusion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PocketDiffusion.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3ED3E7902ED66A190056FC4A /* PocketDiffusionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PocketDiffusionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3ED3E79A2ED66A190056FC4A /* PocketDiffusionUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PocketDiffusionUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		3ED3E7832ED66A190056FC4A /* TreeID */ = {
+		3ED3E7832ED66A190056FC4A /* PocketDiffusion */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			explicitFolders = (
 				Resources/StableDiffusionModel,
 			);
-			path = TreeID;
+			path = PocketDiffusion;
 			sourceTree = "<group>";
 		};
-		3ED3E7932ED66A190056FC4A /* TreeIDTests */ = {
+		3ED3E7932ED66A190056FC4A /* PocketDiffusionTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = TreeIDTests;
-			sourceTree = "<group>";
-		};
-		3ED3E79D2ED66A190056FC4A /* TreeIDUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = TreeIDUITests;
+			path = PocketDiffusionTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -83,9 +78,8 @@
 		3ED3E7782ED66A190056FC4A = {
 			isa = PBXGroup;
 			children = (
-				3ED3E7832ED66A190056FC4A /* TreeID */,
-				3ED3E7932ED66A190056FC4A /* TreeIDTests */,
-				3ED3E79D2ED66A190056FC4A /* TreeIDUITests */,
+				3ED3E7832ED66A190056FC4A /* PocketDiffusion */,
+				3ED3E7932ED66A190056FC4A /* PocketDiffusionTests */,
 				3ED3E7822ED66A190056FC4A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -93,9 +87,9 @@
 		3ED3E7822ED66A190056FC4A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3ED3E7812ED66A190056FC4A /* TreeID.app */,
-				3ED3E7902ED66A190056FC4A /* TreeIDTests.xctest */,
-				3ED3E79A2ED66A190056FC4A /* TreeIDUITests.xctest */,
+				3ED3E7812ED66A190056FC4A /* PocketDiffusion.app */,
+				3ED3E7902ED66A190056FC4A /* PocketDiffusionTests.xctest */,
+				3ED3E79A2ED66A190056FC4A /* PocketDiffusionUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -103,9 +97,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		3ED3E7802ED66A190056FC4A /* TreeID */ = {
+		3ED3E7802ED66A190056FC4A /* PocketDiffusion */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3ED3E7A42ED66A190056FC4A /* Build configuration list for PBXNativeTarget "TreeID" */;
+			buildConfigurationList = 3ED3E7A42ED66A190056FC4A /* Build configuration list for PBXNativeTarget "PocketDiffusion" */;
 			buildPhases = (
 				3ED3E77D2ED66A190056FC4A /* Sources */,
 				3ED3E77E2ED66A190056FC4A /* Frameworks */,
@@ -116,19 +110,19 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				3ED3E7832ED66A190056FC4A /* TreeID */,
+				3ED3E7832ED66A190056FC4A /* PocketDiffusion */,
 			);
-			name = TreeID;
+			name = PocketDiffusion;
 			packageProductDependencies = (
 				3EF349EB2F0D079C005720F2 /* StableDiffusion */,
 			);
 			productName = TreeID;
-			productReference = 3ED3E7812ED66A190056FC4A /* TreeID.app */;
+			productReference = 3ED3E7812ED66A190056FC4A /* PocketDiffusion.app */;
 			productType = "com.apple.product-type.application";
 		};
-		3ED3E78F2ED66A190056FC4A /* TreeIDTests */ = {
+		3ED3E78F2ED66A190056FC4A /* PocketDiffusionTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3ED3E7A72ED66A190056FC4A /* Build configuration list for PBXNativeTarget "TreeIDTests" */;
+			buildConfigurationList = 3ED3E7A72ED66A190056FC4A /* Build configuration list for PBXNativeTarget "PocketDiffusionTests" */;
 			buildPhases = (
 				3ED3E78C2ED66A190056FC4A /* Sources */,
 				3ED3E78D2ED66A190056FC4A /* Frameworks */,
@@ -140,18 +134,18 @@
 				3ED3E7922ED66A190056FC4A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				3ED3E7932ED66A190056FC4A /* TreeIDTests */,
+				3ED3E7932ED66A190056FC4A /* PocketDiffusionTests */,
 			);
-			name = TreeIDTests;
+			name = PocketDiffusionTests;
 			packageProductDependencies = (
 			);
 			productName = TreeIDTests;
-			productReference = 3ED3E7902ED66A190056FC4A /* TreeIDTests.xctest */;
+			productReference = 3ED3E7902ED66A190056FC4A /* PocketDiffusionTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		3ED3E7992ED66A190056FC4A /* TreeIDUITests */ = {
+		3ED3E7992ED66A190056FC4A /* PocketDiffusionUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3ED3E7AA2ED66A190056FC4A /* Build configuration list for PBXNativeTarget "TreeIDUITests" */;
+			buildConfigurationList = 3ED3E7AA2ED66A190056FC4A /* Build configuration list for PBXNativeTarget "PocketDiffusionUITests" */;
 			buildPhases = (
 				3ED3E7962ED66A190056FC4A /* Sources */,
 				3ED3E7972ED66A190056FC4A /* Frameworks */,
@@ -162,14 +156,11 @@
 			dependencies = (
 				3ED3E79C2ED66A190056FC4A /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				3ED3E79D2ED66A190056FC4A /* TreeIDUITests */,
-			);
-			name = TreeIDUITests;
+			name = PocketDiffusionUITests;
 			packageProductDependencies = (
 			);
 			productName = TreeIDUITests;
-			productReference = 3ED3E79A2ED66A190056FC4A /* TreeIDUITests.xctest */;
+			productReference = 3ED3E79A2ED66A190056FC4A /* PocketDiffusionUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -195,7 +186,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 3ED3E77C2ED66A190056FC4A /* Build configuration list for PBXProject "TreeID" */;
+			buildConfigurationList = 3ED3E77C2ED66A190056FC4A /* Build configuration list for PBXProject "PocketDiffusion" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -212,9 +203,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				3ED3E7802ED66A190056FC4A /* TreeID */,
-				3ED3E78F2ED66A190056FC4A /* TreeIDTests */,
-				3ED3E7992ED66A190056FC4A /* TreeIDUITests */,
+				3ED3E7802ED66A190056FC4A /* PocketDiffusion */,
+				3ED3E78F2ED66A190056FC4A /* PocketDiffusionTests */,
+				3ED3E7992ED66A190056FC4A /* PocketDiffusionUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -270,12 +261,12 @@
 /* Begin PBXTargetDependency section */
 		3ED3E7922ED66A190056FC4A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 3ED3E7802ED66A190056FC4A /* TreeID */;
+			target = 3ED3E7802ED66A190056FC4A /* PocketDiffusion */;
 			targetProxy = 3ED3E7912ED66A190056FC4A /* PBXContainerItemProxy */;
 		};
 		3ED3E79C2ED66A190056FC4A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 3ED3E7802ED66A190056FC4A /* TreeID */;
+			target = 3ED3E7802ED66A190056FC4A /* PocketDiffusion */;
 			targetProxy = 3ED3E79B2ED66A190056FC4A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -430,7 +421,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.Lokae0.TreeID;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Lokae0.PocketDiffusion;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -475,7 +466,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.Lokae0.TreeID;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Lokae0.PocketDiffusion;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -512,7 +503,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TreeID.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TreeID";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PocketDiffusion.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PocketDiffusion";
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Debug;
@@ -538,7 +529,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TreeID.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TreeID";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PocketDiffusion.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PocketDiffusion";
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Release;
@@ -596,7 +587,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3ED3E77C2ED66A190056FC4A /* Build configuration list for PBXProject "TreeID" */ = {
+		3ED3E77C2ED66A190056FC4A /* Build configuration list for PBXProject "PocketDiffusion" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3ED3E7A22ED66A190056FC4A /* Debug */,
@@ -605,7 +596,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3ED3E7A42ED66A190056FC4A /* Build configuration list for PBXNativeTarget "TreeID" */ = {
+		3ED3E7A42ED66A190056FC4A /* Build configuration list for PBXNativeTarget "PocketDiffusion" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3ED3E7A52ED66A190056FC4A /* Debug */,
@@ -614,7 +605,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3ED3E7A72ED66A190056FC4A /* Build configuration list for PBXNativeTarget "TreeIDTests" */ = {
+		3ED3E7A72ED66A190056FC4A /* Build configuration list for PBXNativeTarget "PocketDiffusionTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3ED3E7A82ED66A190056FC4A /* Debug */,
@@ -623,7 +614,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3ED3E7AA2ED66A190056FC4A /* Build configuration list for PBXNativeTarget "TreeIDUITests" */ = {
+		3ED3E7AA2ED66A190056FC4A /* Build configuration list for PBXNativeTarget "PocketDiffusionUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3ED3E7AB2ED66A190056FC4A /* Debug */,

@@ -1,6 +1,6 @@
 //
-//  TreeIDApp.swift
-//  TreeID
+//  PocketDiffusionApp.swift
+//  PocketDiffusion
 //
 //  Created by Ian Luo on 11/25/25.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct TreeIDApp: App {
+struct PocketDiffusionApp: App {
 
     var body: some Scene {
         WindowGroup {
@@ -16,3 +16,4 @@ struct TreeIDApp: App {
         }
     }
 }
+

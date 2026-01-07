@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  TreeID
+//  PocketDiffusion
 //
 //  Created by Ian Luo on 11/25/25.
 //

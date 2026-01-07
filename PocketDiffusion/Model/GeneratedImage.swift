@@ -1,6 +1,6 @@
 //
 //  Image.swift
-//  TreeID
+//  PocketDiffusion
 //
 //  Created by Ian Luo on 12/26/25.
 //
@@ -12,3 +12,4 @@ struct GeneratedImage: Identifiable, Hashable {
     let id: UUID = .init()
     let uiImage: UIImage
 }
+

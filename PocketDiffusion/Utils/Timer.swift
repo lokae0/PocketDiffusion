@@ -1,6 +1,6 @@
 //
 //  Timer.swift
-//  TreeID
+//  PocketDiffusion
 //
 //  Created by Ian Luo on 1/6/26.
 //
@@ -57,3 +57,4 @@ final class Timer {
         return duration
     }
 }
+

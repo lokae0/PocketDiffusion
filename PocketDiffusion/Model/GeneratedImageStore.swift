@@ -1,6 +1,6 @@
 //
 //  GeneratedImageStore.swift
-//  TreeID
+//  PocketDiffusion
 //
 //  Created by Ian Luo on 12/26/25.
 //
@@ -32,3 +32,4 @@ final class GeneratedImageStore {
         )
     }
 }
+
