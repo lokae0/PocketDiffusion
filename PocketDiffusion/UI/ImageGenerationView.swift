@@ -46,7 +46,7 @@ struct ImageGenerationView: View {
 
     var body: some View {
         VStack {
-           Image(uiImage: imageStore.currentGeneration.uiImage)
+           Image(uiImage: imageStore.previewImage)
                 .resizable()
                 .scaledToFit()
                 .cornerRadius(UI.cornerRadius)

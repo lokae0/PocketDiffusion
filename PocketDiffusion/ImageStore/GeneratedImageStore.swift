@@ -9,8 +9,8 @@ import UIKit
 
 public protocol GeneratedImageStoring {
 
-    /// Updates with preview images as they are generated. Starts with a placeholder
-    var currentGeneration: GeneratedImage { get set }
+    /// Updates as previews are generated. Starts with a placeholder
+    var previewImage: UIImage { get set }
 
     /// Persisted image collection
     var storedImages: [GeneratedImage] { get }
@@ -22,10 +22,7 @@ public protocol GeneratedImageStoring {
 @Observable
 final class GeneratedImageStore<Generator: Generating>: GeneratedImageStoring {
 
-    var currentGeneration: GeneratedImage = .init(
-        uiImage: .image(color: .gray),
-        params: .defaultValues
-    )
+    var previewImage: UIImage = .image(color: .gray)
     private(set) var storedImages: [GeneratedImage] = []
 
     private let imageGenerator: Generator
@@ -45,13 +42,15 @@ final class GeneratedImageStore<Generator: Generating>: GeneratedImageStoring {
                     for: "Setting currentGeneration",
                     isEnabled: false
                 )
-                currentGeneration = GeneratedImage(
-                    uiImage: uiImage,
-                    params: params
-                )
+                previewImage = uiImage
             }
             // Last preview image is the final result
-            storedImages.append(currentGeneration)
+            storedImages.append(
+                GeneratedImage(
+                    uiImage: previewImage,
+                    params: params
+                )
+            )
             Timer.shared.stopTimer(type: .imageGeneration)
         }
     }
