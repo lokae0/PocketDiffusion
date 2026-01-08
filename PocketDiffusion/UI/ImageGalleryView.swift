@@ -16,16 +16,12 @@ struct ImageGalleryView: View {
     @Binding var imageStore: GeneratedImageStoring
 
     var body: some View {
-        if imageStore.storedImages.isEmpty == false {
-            List {
-                ForEach(imageStore.storedImages) { storedImage in
-                    Image(uiImage: storedImage.uiImage)
-                        .resizable()
-                        .scaledToFit()
-                        .cornerRadius(UI.cornerRadius)
-                        .frame(height: UI.imageHeight)
-                }
-            }
+        List(imageStore.storedImages) { storedImage in
+            Image(uiImage: storedImage.uiImage)
+                .resizable()
+                .scaledToFit()
+                .cornerRadius(UI.cornerRadius)
+                .frame(height: UI.imageHeight)
         }
     }
 }

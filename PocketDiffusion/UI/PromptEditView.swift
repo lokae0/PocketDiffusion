@@ -1,0 +1,108 @@
+//
+//  PromptEditView.swift
+//  PocketDiffusion
+//
+//  Created by Ian Luo on 1/7/26.
+//
+
+import Combine
+import SwiftUI
+
+struct PromptEditView: View {
+
+    let title: String
+    @Binding var text: String
+    @State private var originalText: String = ""
+
+    @Environment(\.dismiss) private var dismiss
+    @FocusState private var isFocused: Bool
+
+    @State private var showCancelAlert: Bool = false
+    @State private var showEraseAlert: Bool = false
+
+    var body: some View {
+        NavigationStack {
+            TextEditor(text: $text)
+                .focused($isFocused)
+                .scrollIndicators(.hidden)
+                .toolbar {
+                    eraseToolbarItem
+                    cancelToolbarItem
+                    saveToolBarItem
+                }
+                .padding(UI.Spacing.large)
+                .navigationTitle(title)
+                .navigationBarTitleDisplayMode(.inline)
+        }
+        .onAppear {
+            originalText = text
+            isFocused = true
+        }
+    }
+
+    @ToolbarContentBuilder
+    private var cancelToolbarItem: some ToolbarContent {
+        ToolbarItem(placement: .cancellationAction) {
+            Button {
+                if text != originalText {
+                    showCancelAlert = true
+                } else {
+                    dismiss()
+                }
+            } label: {
+                Label("Cancel", systemImage: "xmark")
+            }
+            .alert("Discard changes?", isPresented: $showCancelAlert) {
+                Button(role: .destructive) {
+                    text = originalText
+                    dismiss()
+                } label: {
+                    Text("Discard")
+                }
+                Button("Cancel", role: .cancel) {
+                    showCancelAlert = false
+                }
+            }
+        }
+    }
+
+    @ToolbarContentBuilder
+    private var saveToolBarItem: some ToolbarContent {
+        ToolbarItem(placement: .confirmationAction) {
+            Button {
+                dismiss()
+            } label: {
+                Label("Save", systemImage: "checkmark")
+            }
+            .disabled(text.isEmpty)
+        }
+    }
+
+    @ToolbarContentBuilder
+    private var eraseToolbarItem: some ToolbarContent {
+        ToolbarItem(placement: .navigation) {
+            Button {
+                showEraseAlert = true
+            } label: {
+                Label("Erase", systemImage: "eraser")
+            }
+            .disabled(text.isEmpty)
+            .alert("Erase all content?", isPresented: $showEraseAlert) {
+                Button(role: .destructive) {
+                    text = ""
+                } label: {
+                    Text("Erase")
+                }
+                Button("Cancel", role: .cancel) {
+                    showEraseAlert = false
+                }
+            }
+        }
+    }
+}
+
+#Preview {
+    @Previewable @State var text: String = .samplePrompt
+
+    PromptEditView(title: "Prompt", text: $text)
+}
