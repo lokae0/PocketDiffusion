@@ -45,23 +45,20 @@ struct ImageGenerationView: View {
     }
 
     var body: some View {
-        VStack(spacing: UI.Spacing.small) {
+        VStack {
            Image(uiImage: imageStore.currentGeneration.uiImage)
                 .resizable()
                 .scaledToFit()
-                .contentTransition(.opacity)
                 .cornerRadius(UI.cornerRadius)
                 .frame(height: UI.imageHeight)
+                .padding(
+                    .horizontal,
+                    UI.Spacing.medium
+                )
 
             Form {
-                LabeledContent(Modal.prompt.title, value: prompt)
-                    .onTapGesture {
-                        shownModal = .prompt
-                    }
-                LabeledContent(Modal.negativePrompt.title, value: negativePrompt)
-                    .onTapGesture {
-                        shownModal = .negativePrompt
-                    }
+                labeledContent(for: .prompt, value: prompt)
+                labeledContent(for: .negativePrompt, value: negativePrompt)
             }
             .sheet(item: $shownModal) { modal in
                 switch modal {
@@ -79,7 +76,6 @@ struct ImageGenerationView: View {
                 }
             }
 
-
             Button("Generate", role: nil) {
                 Timer.shared.startTimer(type: .modelLoading)
                 imageStore.generateImages(
@@ -93,8 +89,23 @@ struct ImageGenerationView: View {
                     )
                 )
             }
+            .controlSize(.large)
+            .buttonStyle(.glass)
+            .padding(
+                [.bottom],
+                UI.Spacing.large
+            )
         }
-        .padding(UI.Spacing.large)
+    }
+
+    @ViewBuilder
+    private func labeledContent<V: StringProtocol>(for modal: Modal, value: V) -> some View {
+        LabeledContent(modal.title, value: value)
+            .lineLimit(1)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                shownModal = modal
+            }
     }
 }
 
