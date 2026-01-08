@@ -7,37 +7,36 @@
 
 import UIKit
 
-protocol GeneratedImageStoring {
+public protocol GeneratedImageStoring {
 
-    var currentGeneration: GeneratedImage? { get set }
+    /// Updates with preview images as they are generated. Starts with a placeholder
+    var currentGeneration: GeneratedImage { get set }
+
+    /// Persisted image collection
     var storedImages: [GeneratedImage] { get }
 
-    func handle(
-        prompt: String,
-        negativePrompt: String
-    )
+    /// Kicks off image generation and updates preview and result images when done
+    func generateImages(with params: GenerationParameters)
 }
 
 @Observable
 final class GeneratedImageStore<Generator: Generating>: GeneratedImageStoring {
 
-    var currentGeneration: GeneratedImage?
+    var currentGeneration: GeneratedImage = .init(
+        uiImage: .image(color: .gray),
+        params: .defaultValues
+    )
     private(set) var storedImages: [GeneratedImage] = []
+
     private let imageGenerator: Generator
 
     init(imageGenerator: Generator = ImageGenerator()) {
         self.imageGenerator = imageGenerator
     }
 
-    func handle(
-        prompt: String,
-        negativePrompt: String
-    ) {
+    func generateImages(with params: GenerationParameters) {
         Task {
-            for await generated in await imageGenerator.generate(
-                prompt: prompt,
-                negativePrompt: negativePrompt
-            ) {
+            for await generated in await imageGenerator.generate(with: params) {
                 guard let uiImage = generated as? UIImage else {
                     Log.shared.info("Unexpected type for generated image!!")
                     continue
@@ -46,12 +45,13 @@ final class GeneratedImageStore<Generator: Generating>: GeneratedImageStoring {
                     for: "Setting currentGeneration",
                     isEnabled: false
                 )
-                currentGeneration = GeneratedImage(uiImage: uiImage)
+                currentGeneration = GeneratedImage(
+                    uiImage: uiImage,
+                    params: params
+                )
             }
-
-            if let gen = currentGeneration {
-                storedImages.append(gen)
-            }
+            // Last preview image is the final result
+            storedImages.append(currentGeneration)
             Timer.shared.stopTimer(type: .imageGeneration)
         }
     }

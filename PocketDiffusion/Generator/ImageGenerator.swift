@@ -12,7 +12,9 @@ import UIKit
 public protocol Generating: Actor {
 
     associatedtype Generated: Sendable
-    func generate(prompt: String, negativePrompt: String) -> AsyncStream<Generated>
+
+    /// Loads diffusion models if required and begins image generation when ready
+    func generate(with params: GenerationParameters) -> AsyncStream<Generated>
 }
 
 final actor ImageGenerator: Generating {
@@ -54,15 +56,15 @@ final actor ImageGenerator: Generating {
         }
     }
 
-    func generate(prompt: String, negativePrompt: String) -> AsyncStream<Generated> {
+    func generate(with params: GenerationParameters) -> AsyncStream<Generated> {
         AsyncStream { continuation in
             Log.shared.currentThread(for: "Scheduling image generation")
 
-            var config = StableDiffusionPipeline.Configuration(prompt: prompt)
-            config.negativePrompt = negativePrompt
-            config.stepCount = 25
-            config.guidanceScale = 11
-            config.seed = UInt32.random(in: 0..<UInt32.max)
+            var config = StableDiffusionPipeline.Configuration(prompt: params.prompt)
+            config.negativePrompt = params.negativePrompt
+            config.stepCount = params.stepCount
+            config.guidanceScale = Float(params.guidanceScale)
+            config.seed = params.shouldRandomize ? UInt32.random(in: 0..<UInt32.max) : params.seed
             config.useDenoisedIntermediates = true
             config.schedulerType = .dpmSolverMultistepScheduler
 

@@ -17,26 +17,33 @@ struct ImageGenerationView: View {
 
     @State private var prompt: String = ""
     @State private var negativePrompt: String = ""
+    @State private var stepCount: Int = 25
+    @State private var guidanceScale: Int = 11
+    @State private var seed: UInt32 = 0
+    @State private var shouldRandomize: Bool = true
 
     var body: some View {
         VStack(spacing: UI.Spacing.medium) {
-            if let image = imageStore.currentGeneration?.uiImage {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .cornerRadius(UI.cornerRadius)
-                    .frame(height: UI.imageHeight)
-            }
+           Image(uiImage: imageStore.currentGeneration.uiImage)
+                .resizable()
+                .scaledToFit()
+                .cornerRadius(UI.cornerRadius)
+                .frame(height: UI.imageHeight)
 
             TextField("Prompt", text: $prompt)
             TextField("Negative Prompt", text: $negativePrompt)
 
             Button("Generate", role: nil) {
                 Timer.shared.startTimer(type: .modelLoading)
-
-                imageStore.handle(
-                    prompt: prompt,
-                    negativePrompt: negativePrompt
+                imageStore.generateImages(
+                    with: GenerationParameters(
+                        prompt: prompt,
+                        negativePrompt: negativePrompt,
+                        stepCount: stepCount,
+                        guidanceScale: guidanceScale,
+                        seed: seed,
+                        shouldRandomize: shouldRandomize
+                    )
                 )
             }
         }
