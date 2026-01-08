@@ -17,11 +17,25 @@ public protocol Generating: Actor {
     func generate(with params: GenerationParameters) -> AsyncStream<Generated>
 }
 
+public enum GeneratorState {
+    case idle
+    case loading
+    case generating
+}
+
 final actor ImageGenerator: Generating {
 
     typealias Generated = UIImage
 
-    let pipeline: StableDiffusionPipeline
+    lazy var state: AsyncStream<GeneratorState> = {
+        .init() { continuation in
+            stateContinuation = continuation
+            continuation.yield(.idle)
+        }
+    }()
+
+    private var stateContinuation: AsyncStream<GeneratorState>.Continuation?
+    private let pipeline: StableDiffusionPipeline
 
     init() {
         func logFatalLoadError() -> Never {
@@ -33,6 +47,7 @@ final actor ImageGenerator: Generating {
         }
         do {
             Log.shared.currentThread(for: "Starting image generator init")
+            stateContinuation?.yield(.loading)
 
             let mlConfig = MLModelConfiguration()
             mlConfig.computeUnits = .cpuAndNeuralEngine
@@ -58,8 +73,6 @@ final actor ImageGenerator: Generating {
 
     func generate(with params: GenerationParameters) -> AsyncStream<Generated> {
         AsyncStream { continuation in
-            Log.shared.currentThread(for: "Scheduling image generation")
-
             var config = StableDiffusionPipeline.Configuration(prompt: params.prompt)
             config.negativePrompt = params.negativePrompt
             config.stepCount = params.stepCount
@@ -68,15 +81,15 @@ final actor ImageGenerator: Generating {
             config.useDenoisedIntermediates = true
             config.schedulerType = .dpmSolverMultistepScheduler
 
-            // TODO: handle errors
             Task {
+                await Timer.shared.stopTimer(type: .modelLoading)
+                Log.shared.currentThread(for: "Calling pipeline.generateImages with params: \(params)")
+
+                await Timer.shared.startTimer(type: .imageGeneration)
+                stateContinuation?.yield(.generating)
+
+                // TODO: handle errors
                 let _ = try! pipeline.generateImages(configuration: config) { progress in
-                    if progress.step == 0 {
-                        Task { @MainActor in
-                            Timer.shared.stopTimer(type: .modelLoading)
-                            Timer.shared.startTimer(type: .imageGeneration)
-                        }
-                    }
                     // Return stream of images as they're generated
                     if let currentImage = progress.currentImages.compactMap({ $0 }).last {
                         Log.shared.info("Step: \(progress.step)")
@@ -86,6 +99,7 @@ final actor ImageGenerator: Generating {
                     // Check if we're done
                     if progress.step == progress.stepCount - 1 {
                         Log.shared.info("Finished generating")
+                        stateContinuation?.yield(.idle)
                         continuation.finish()
                     }
                     return true
