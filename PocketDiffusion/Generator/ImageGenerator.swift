@@ -10,6 +10,7 @@ import StableDiffusion
 import UIKit
 
 public protocol Generating: Actor {
+
     associatedtype Generated: Sendable
     func generate(prompt: String, negativePrompt: String) -> AsyncStream<Generated>
 }

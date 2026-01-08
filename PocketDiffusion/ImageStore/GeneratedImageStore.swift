@@ -8,9 +8,14 @@
 import UIKit
 
 protocol GeneratedImageStoring {
+
     var currentGeneration: GeneratedImage? { get set }
     var storedImages: [GeneratedImage] { get }
-    func handle(prompt: String, negativePrompt: String)
+
+    func handle(
+        prompt: String,
+        negativePrompt: String
+    )
 }
 
 @Observable
@@ -24,7 +29,10 @@ final class GeneratedImageStore<Generator: Generating>: GeneratedImageStoring {
         self.imageGenerator = imageGenerator
     }
 
-    func handle(prompt: String, negativePrompt: String) {
+    func handle(
+        prompt: String,
+        negativePrompt: String
+    ) {
         Task {
             for await generated in await imageGenerator.generate(
                 prompt: prompt,
