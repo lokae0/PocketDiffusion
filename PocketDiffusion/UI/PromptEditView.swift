@@ -35,6 +35,9 @@ struct PromptEditView: View {
                 .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear {
+            if text == .promptPlaceholder {
+                text = ""
+            }
             originalText = text
             isFocused = true
         }
