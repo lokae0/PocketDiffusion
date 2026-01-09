@@ -40,14 +40,15 @@ struct NumberEntryView: View {
         NavigationStack {
             VStack(spacing: UI.Spacing.extraLarge) {
                 HStack(spacing: UI.Spacing.medium) {
+                    let step = isDecimalShown ? 0.1 : 1.0
                     stepperButton(systemImage: UI.Symbol.minus, limit: min) {
-                        number -= 1.0
+                        number -= step
                     }
 
                     numberTextField
 
                     stepperButton(systemImage: UI.Symbol.plus, limit: max) {
-                        number += 1.0
+                        number += step
                     }
                 }
 
@@ -84,6 +85,7 @@ private extension NumberEntryView {
 
         TextField("", value: $number, format: format)
             .disabled(isKeyboardEnabled == false)
+            .minimumScaleFactor(0.5)
             .keyboardType(type)
             .font(.system(size: UI.numberSize))
             .multilineTextAlignment(.center)

@@ -133,8 +133,7 @@ private extension ImageGenerationView {
                     negativePrompt: negativePrompt == .promptPlaceholder ? "" : prompt,
                     stepCount: stepCount,
                     guidanceScale: guidanceScale,
-                    seed: UInt32(seed),
-                    isSeedRandom: isSeedRandom
+                    seed: isSeedRandom ? UInt32.random(in: 0..<UInt32.max) : UInt32(seed),
                 )
             )
         }
@@ -244,7 +243,7 @@ private extension ImageGenerationView {
             NumberEntryView(
                 title: Modal.seed.title,
                 min: 0.0,
-                max: 50000.0,
+                max: Double(UInt32.max),
                 isSliderEnabled: false,
                 isKeyboardEnabled: true,
                 number: seedDouble

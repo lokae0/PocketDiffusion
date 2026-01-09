@@ -60,7 +60,7 @@ final actor ImageGenerator: Generating {
             config.negativePrompt = params.negativePrompt
             config.stepCount = params.stepCount
             config.guidanceScale = Float(params.guidanceScale)
-            config.seed = params.isSeedRandom ? UInt32.random(in: 0..<UInt32.max) : params.seed
+            config.seed = params.seed
             config.useDenoisedIntermediates = true
             config.schedulerType = .dpmSolverMultistepScheduler
 

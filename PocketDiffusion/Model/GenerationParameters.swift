@@ -14,7 +14,6 @@ public struct GenerationParameters: Hashable, Sendable {
     let stepCount: Int
     let guidanceScale: Double
     let seed: UInt32
-    let isSeedRandom: Bool
 }
 
 extension GenerationParameters {
@@ -24,7 +23,6 @@ extension GenerationParameters {
         negativePrompt: "",
         stepCount: 25,
         guidanceScale: 11.0,
-        seed: 0,
-        isSeedRandom: true
+        seed: 0
     )
 }
