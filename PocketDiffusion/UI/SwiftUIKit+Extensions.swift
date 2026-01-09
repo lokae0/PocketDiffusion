@@ -5,6 +5,7 @@
 //  Created by Ian Luo on 1/7/26.
 //
 
+import SwiftUI
 import UIKit
 
 private extension UI {
@@ -12,6 +13,7 @@ private extension UI {
 }
 
 extension UIImage {
+
     static func image(color: UIColor) -> UIImage {
         let size = CGSize(width: UI.imageSize, height: UI.imageSize)
         let renderer = UIGraphicsImageRenderer(size: size)
@@ -20,5 +22,20 @@ extension UIImage {
             context.fill(CGRect(origin: .zero, size: size))
         }
         return image
+    }
+
+    static var placeholder: UIImage {
+        .image(color: .gray)
+    }
+}
+
+extension View {
+
+    func centeredInFrame() -> some View {
+        frame(
+            maxWidth: .infinity,
+            maxHeight: .infinity,
+            alignment: .center
+        )
     }
 }

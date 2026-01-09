@@ -36,7 +36,7 @@ final class GeneratedImageStore<Generator: Generating>: GeneratedImageStoring {
 
     private(set) var state: GenerationState = .idle
 
-    var previewImage: UIImage = .image(color: .gray)
+    var previewImage: UIImage = .placeholder
     private(set) var storedImages: [GeneratedImage] = []
 
     private let imageGenerator: Generator
@@ -47,6 +47,7 @@ final class GeneratedImageStore<Generator: Generating>: GeneratedImageStoring {
 
     func generateImages(with params: GenerationParameters) {
         state = .waiting
+        previewImage = .placeholder
         Timer.shared.startTimer(type: .awaitingPipeline)
 
         Task {
