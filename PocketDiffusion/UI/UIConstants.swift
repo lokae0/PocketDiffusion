@@ -5,10 +5,11 @@
 //  Created by Ian Luo on 1/7/26.
 //
 
-import Foundation
+import SwiftUI
 
 enum UI {
     static let cornerRadius: CGFloat = 16.0
+    static let tintColor: Color = .pink
 
     enum Spacing {
         static let small: CGFloat = 8.0

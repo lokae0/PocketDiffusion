@@ -54,7 +54,7 @@ struct ImageGenerationView: View {
     }
 
     var body: some View {
-        VStack {
+        ZStack {
             Form {
                 Section {
                     previewImage
@@ -69,6 +69,7 @@ struct ImageGenerationView: View {
                     labeledContent(for: .guidanceScale, value: String(guidanceScale))
                 }
             }
+            .scrollIndicators(.hidden)
             .sheet(
                 item: $shownModal,
                 onDismiss: {
@@ -79,6 +80,11 @@ struct ImageGenerationView: View {
 
             generatorButton
                 .padding(.bottom, UI.Spacing.large)
+                .frame(
+                    maxWidth: .infinity,
+                    maxHeight: .infinity,
+                    alignment: .bottom
+                )
         }
     }
 
@@ -97,7 +103,7 @@ private extension ImageGenerationView {
     @ViewBuilder
     private var generatorButton: some View {
         let isInProgress = imageStore.state == .waiting || imageStore.state == .receiving
-        let title = isInProgress ? "In progress" : "Generate"
+        let title = isInProgress ? "In progress..." : "Generate"
 
         Button(title, role: nil) {
             imageStore.generateImages(
@@ -114,6 +120,7 @@ private extension ImageGenerationView {
         .disabled(isInProgress)
         .controlSize(.large)
         .buttonStyle(.glass)
+        .tint(UI.tintColor)
     }
 
     @ViewBuilder
@@ -143,6 +150,9 @@ private extension ImageGenerationView {
             if imageStore.state == .done {
                 Image(systemName: UI.Symbol.checkmarkCircleFill)
                     .font(.system(size: UI.DoneIndicator.size))
+                    .foregroundStyle(UI.tintColor)
+                    .background(.white)
+                    .cornerRadius(UI.DoneIndicator.size)
                     .shadow(radius: UI.DoneIndicator.shadowRadius)
                     .transition(.symbolEffect)
                     .frame(
