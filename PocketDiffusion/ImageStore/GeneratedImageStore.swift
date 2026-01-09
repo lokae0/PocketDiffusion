@@ -9,6 +9,9 @@ import UIKit
 
 public protocol GeneratedImageStoring {
 
+    /// Current image generation status
+    var state: GenerationState { get }
+
     /// Updates as previews are generated. Starts with a placeholder
     var previewImage: UIImage { get set }
 
@@ -19,8 +22,19 @@ public protocol GeneratedImageStoring {
     func generateImages(with params: GenerationParameters)
 }
 
+public enum GenerationState {
+    /// Nothing is currently happening
+    case idle
+    /// Waiting for models to load or generator to become ready
+    case waiting
+    /// Generation is underway and images are actively being received
+    case receiving
+}
+
 @Observable
 final class GeneratedImageStore<Generator: Generating>: GeneratedImageStoring {
+
+    private(set) var state: GenerationState = .idle
 
     var previewImage: UIImage = .image(color: .gray)
     private(set) var storedImages: [GeneratedImage] = []
@@ -32,6 +46,9 @@ final class GeneratedImageStore<Generator: Generating>: GeneratedImageStoring {
     }
 
     func generateImages(with params: GenerationParameters) {
+        state = .waiting
+        Timer.shared.startTimer(type: .awaitingPipeline)
+
         Task {
             for await generated in await imageGenerator.generate(with: params) {
                 guard let uiImage = generated as? UIImage else {
@@ -39,11 +56,16 @@ final class GeneratedImageStore<Generator: Generating>: GeneratedImageStoring {
                     continue
                 }
                 Log.shared.currentThread(
-                    for: "Setting currentGeneration",
+                    for: "Receiving preview images",
                     isEnabled: false
                 )
+                state = .receiving
                 previewImage = uiImage
             }
+
+            Timer.shared.stopTimer(type: .imageGeneration)
+            state = .idle
+
             // Last preview image is the final result
             storedImages.append(
                 GeneratedImage(
@@ -51,7 +73,6 @@ final class GeneratedImageStore<Generator: Generating>: GeneratedImageStoring {
                     params: params
                 )
             )
-            Timer.shared.stopTimer(type: .imageGeneration)
         }
     }
 }

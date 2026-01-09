@@ -16,15 +16,15 @@ final class Timer {
     private init() {}
 
     enum `Type` {
-        /// How long it takes to load models before image generation begins
-        case modelLoading
+        /// How long it takes to load models or other preparation before pipeline is ready
+        case awaitingPipeline
         /// How long image generation takes
         case imageGeneration
 
         var label: String {
             switch self {
             case .imageGeneration: "Image generation"
-            case .modelLoading: "Model loading"
+            case .awaitingPipeline: "Awaiting pipeline"
             }
         }
     }
@@ -34,7 +34,7 @@ final class Timer {
 
     func startTimer(type: Type, shouldLog: Bool = true) {
         switch type {
-        case .modelLoading:
+        case .awaitingPipeline:
             Self.loadingTimer.start()
         case .imageGeneration:
             Self.generationTimer.start()
@@ -49,7 +49,7 @@ final class Timer {
         let duration: Double
 
         switch type {
-        case .modelLoading:
+        case .awaitingPipeline:
             duration = Self.loadingTimer.stop()
         case .imageGeneration:
             duration = Self.generationTimer.stop()

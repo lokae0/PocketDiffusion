@@ -13,28 +13,14 @@ public protocol Generating: Actor {
 
     associatedtype Generated: Sendable
 
-    /// Loads diffusion models if required and begins image generation when ready
+    /// Loads models if required and begins generation when ready
     func generate(with params: GenerationParameters) -> AsyncStream<Generated>
-}
-
-public enum GeneratorState {
-    case idle
-    case loading
-    case generating
 }
 
 final actor ImageGenerator: Generating {
 
     typealias Generated = UIImage
 
-    lazy var state: AsyncStream<GeneratorState> = {
-        .init() { continuation in
-            stateContinuation = continuation
-            continuation.yield(.idle)
-        }
-    }()
-
-    private var stateContinuation: AsyncStream<GeneratorState>.Continuation?
     private let pipeline: StableDiffusionPipeline
 
     init() {
@@ -46,8 +32,7 @@ final actor ImageGenerator: Generating {
             logFatalLoadError()
         }
         do {
-            Log.shared.currentThread(for: "Starting image generator init")
-            stateContinuation?.yield(.loading)
+            Log.shared.currentThread(for: "Setting up image generator pipeline")
 
             let mlConfig = MLModelConfiguration()
             mlConfig.computeUnits = .cpuAndNeuralEngine
@@ -63,7 +48,7 @@ final actor ImageGenerator: Generating {
                 try await prewarm()
             }
             Log.shared.currentThread(
-                for: "Ending image generator init",
+                for: "Ending image generator setup",
                 isEnabled: false
             )
         } catch {
@@ -82,12 +67,10 @@ final actor ImageGenerator: Generating {
             config.schedulerType = .dpmSolverMultistepScheduler
 
             Task {
-                await Timer.shared.stopTimer(type: .modelLoading)
+                await Timer.shared.stopTimer(type: .awaitingPipeline)
                 Log.shared.currentThread(for: "Calling pipeline.generateImages with params: \(params)")
 
                 await Timer.shared.startTimer(type: .imageGeneration)
-                stateContinuation?.yield(.generating)
-
                 // TODO: handle errors
                 let _ = try! pipeline.generateImages(configuration: config) { progress in
                     // Return stream of images as they're generated
@@ -99,7 +82,6 @@ final actor ImageGenerator: Generating {
                     // Check if we're done
                     if progress.step == progress.stepCount - 1 {
                         Log.shared.info("Finished generating")
-                        stateContinuation?.yield(.idle)
                         continuation.finish()
                     }
                     return true

@@ -91,7 +91,6 @@ struct ImageGenerationView: View {
                 })
 
             Button("Generate", role: nil) {
-                Timer.shared.startTimer(type: .modelLoading)
                 imageStore.generateImages(
                     with: GenerationParameters(
                         prompt: prompt == .promptPlaceholder ? "" : prompt,
