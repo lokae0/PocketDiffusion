@@ -20,11 +20,14 @@ public protocol GeneratedImageStoring {
 
     /// Kicks off image generation and updates preview and result images when done
     func generateImages(with params: GenerationParameters)
+
+    /// Cancels image generation process
+    func cancelImageGeneration()
 }
 
 public enum GenerationState {
-    /// Startup state
-    case initial
+    /// Startup or cancelled state
+    case idle
     /// Waiting for models to load or generator to become ready
     case waiting
     /// Generation is underway and images are actively being received
@@ -36,7 +39,7 @@ public enum GenerationState {
 @Observable
 final class GeneratedImageStore<Generator: Generating>: GeneratedImageStoring {
 
-    private(set) var state: GenerationState = .initial
+    private(set) var state: GenerationState = .idle
 
     var previewImage: UIImage = .placeholder
     private(set) var storedImages: [GeneratedImage] = []
@@ -78,4 +81,6 @@ final class GeneratedImageStore<Generator: Generating>: GeneratedImageStoring {
             )
         }
     }
+
+    func cancelImageGeneration() {}
 }

@@ -24,12 +24,10 @@ final actor ImageGenerator: Generating {
     private let pipeline: StableDiffusionPipeline
 
     init() {
-        func logFatalLoadError() -> Never {
-            Log.shared.fatal("Unable to load Stable Diffusion model resources")
-        }
+        let fatalLoadMessage = "Unable to load Stable Diffusion model resources"
 
         guard let modelUrl = Bundle.main.url(forResource: "StableDiffusionModel", withExtension: nil) else {
-            logFatalLoadError()
+            Log.shared.fatal(fatalLoadMessage)
         }
         do {
             Log.shared.currentThread(for: "Setting up image generator pipeline")
@@ -45,14 +43,14 @@ final actor ImageGenerator: Generating {
             )
 
             Task {
-                try await prewarm()
+                await prewarm()
             }
             Log.shared.currentThread(
                 for: "Ending image generator setup",
                 isEnabled: false
             )
         } catch {
-            logFatalLoadError()
+            Log.shared.fatal(fatalLoadMessage)
         }
     }
 
@@ -90,9 +88,13 @@ final actor ImageGenerator: Generating {
         }
     }
 
-    private func prewarm() async throws {
-        Log.shared.currentThread(for: "Prewarming started")
-        try pipeline.prewarmResources()
+    private func prewarm() async {
+        do {
+            Log.shared.currentThread(for: "Prewarming started")
+            try pipeline.prewarmResources()
+        } catch {
+            Log.shared.info("Prewarming failed!!")
+        }
     }
 }
 

@@ -24,6 +24,13 @@ struct ImageGenerationView: View {
 
     @Binding var imageStore: GeneratedImageStoring
 
+    // TODO: remove once it's working
+    private let debugShowCancelButton = false
+
+    private var isGenInProgress: Bool {
+        imageStore.state == .waiting || imageStore.state == .receiving
+    }
+
     @State private var prompt: String = .promptPlaceholder
     @State private var negativePrompt: String = .promptPlaceholder
     @State private var stepCount: Int = 25
@@ -78,13 +85,19 @@ struct ImageGenerationView: View {
                 content: content(for:)
             )
 
-            generatorButton
-                .padding(.bottom, UI.Spacing.large)
-                .frame(
-                    maxWidth: .infinity,
-                    maxHeight: .infinity,
-                    alignment: .bottom
-                )
+            HStack {
+                generatorButton
+
+                if isGenInProgress && debugShowCancelButton {
+                    cancelButton
+                }
+            }
+            .padding(.bottom, UI.Spacing.large)
+            .frame(
+                maxWidth: .infinity,
+                maxHeight: .infinity,
+                alignment: .bottom
+            )
         }
     }
 
@@ -102,8 +115,7 @@ private extension ImageGenerationView {
 
     @ViewBuilder
     private var generatorButton: some View {
-        let isInProgress = imageStore.state == .waiting || imageStore.state == .receiving
-        let title = isInProgress ? "In progress..." : "Generate"
+        let title = isGenInProgress ? "In progress..." : "Generate"
 
         Button(title, role: nil) {
             imageStore.generateImages(
@@ -117,10 +129,19 @@ private extension ImageGenerationView {
                 )
             )
         }
-        .disabled(isInProgress)
+        .disabled(isGenInProgress)
         .controlSize(.large)
         .buttonStyle(.glass)
         .tint(UI.tintColor)
+    }
+
+    @ViewBuilder
+    private var cancelButton: some View {
+        Button("Cancel", role: .destructive) {
+            imageStore.cancelImageGeneration()
+        }
+        .controlSize(.large)
+        .buttonStyle(.glass)
     }
 
     @ViewBuilder

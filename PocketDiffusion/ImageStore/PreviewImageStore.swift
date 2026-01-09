@@ -10,7 +10,7 @@ import UIKit
 @Observable
 final class PreviewImageStore: GeneratedImageStoring {
 
-    var state: GenerationState = .initial
+    var state: GenerationState = .idle
 
     var previewImage: UIImage = .placeholder
 
@@ -21,6 +21,8 @@ final class PreviewImageStore: GeneratedImageStoring {
     ]
 
     func generateImages(with params: GenerationParameters) {}
+
+    func cancelImageGeneration() {}
 }
 
 
