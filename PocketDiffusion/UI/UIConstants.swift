@@ -15,6 +15,7 @@ enum UI {
         static let small: CGFloat = 8.0
         static let medium: CGFloat = 16.0
         static let large: CGFloat = 32.0
+        static let extraLarge: CGFloat = 48.0
     }
 
     enum Symbol {

@@ -9,8 +9,7 @@ import SwiftUI
 
 private extension UI {
     static let numberSize: CGFloat = 36.0
-    static let numberLineWidthScalar: CGFloat = 0.75
-    static let heightAdjustment: CGFloat = 6.0
+    static let widthScalar: CGFloat = 0.75
 
     enum Stepper {
         static let width: CGFloat = 68.0
@@ -23,7 +22,9 @@ struct NumberEntryView: View {
     let title: String
     let min: Double
     let max: Double
-    let showSlider: Bool = true
+    var isSliderEnabled: Bool = true
+    var isDecimalShown: Bool = false
+    var isKeyboardEnabled: Bool = false
 
     @Binding var number: Double
 
@@ -37,25 +38,25 @@ struct NumberEntryView: View {
 
     var body: some View {
         NavigationStack {
-            GeometryReader { geometry in
-                VStack {
-                    HStack(spacing: UI.Spacing.medium) {
-                        stepperButton(systemImage: UI.Symbol.minus, limit: min) {
-                            number -= 1.0
-                        }
-
-                        numberTextField
-
-                        stepperButton(systemImage: UI.Symbol.plus, limit: max) {
-                            number += 1.0
-                        }
+            VStack(spacing: UI.Spacing.extraLarge) {
+                HStack(spacing: UI.Spacing.medium) {
+                    stepperButton(systemImage: UI.Symbol.minus, limit: min) {
+                        number -= 1.0
                     }
-                    .frame(maxWidth: geometry.size.width * UI.numberLineWidthScalar)
-                    .centeredInFrame()
+
+                    numberTextField
+
+                    stepperButton(systemImage: UI.Symbol.plus, limit: max) {
+                        number += 1.0
+                    }
                 }
-                .frame(maxHeight: geometry.size.height / UI.heightAdjustment)
-                .centeredInFrame()
+
+                if isSliderEnabled {
+                    Slider(value: $number, in: min...max)
+                }
             }
+            .padding(.horizontal, UI.Spacing.extraLarge)
+            .centeredInFrame()
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -65,7 +66,9 @@ struct NumberEntryView: View {
         }
         .onAppear {
             originalNumber = number
-            isFocused = true
+            if isKeyboardEnabled {
+                isFocused = true
+            }
         }
     }
 }
@@ -74,10 +77,15 @@ private extension NumberEntryView {
 
     @ViewBuilder
     var numberTextField: some View {
-        TextField("", value: $number, format: .number)
-            .keyboardType(.numberPad)
+        let type: UIKeyboardType = isDecimalShown ? .decimalPad : .numberPad
+        let format: FloatingPointFormatStyle<Double> = isDecimalShown ?
+            .number.precision(.fractionLength((1))) :
+            .number
+
+        TextField("", value: $number, format: format)
+            .disabled(isKeyboardEnabled == false)
+            .keyboardType(type)
             .font(.system(size: UI.numberSize))
-            .tint(.clear)
             .multilineTextAlignment(.center)
             .focused($isFocused)
             .onChange(of: number) { _, newValue in
@@ -143,12 +151,14 @@ private extension NumberEntryView {
 }
 
 #Preview {
-    @Previewable @State var steps: Double = 25
+    @Previewable @State var steps: Double = 25.3
 
     NumberEntryView(
         title: "Step count",
         min: 0.0,
         max: 100.0,
+        isSliderEnabled: true,
+        isDecimalShown: true,
         number: $steps
     )
 }

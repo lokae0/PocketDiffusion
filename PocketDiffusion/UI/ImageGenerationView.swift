@@ -34,9 +34,9 @@ struct ImageGenerationView: View {
     @AppStorage("prompt") private var prompt: String = .promptPlaceholder
     @AppStorage("negativePrompt") private var negativePrompt: String = .promptPlaceholder
     @AppStorage("stepCount") private var stepCount: Int = 25
-    @AppStorage("guidanceScale") private var guidanceScale: Int = 11
+    @AppStorage("guidanceScale") private var guidanceScale: Double = 11
     @AppStorage("seed") private var seed: Int = 0
-    @AppStorage("shouldRandomize") private var shouldRandomize: Bool = true
+    @AppStorage("isSeedRandom") private var isSeedRandom: Bool = true
 
     @State private var shownModal: Modal?
 
@@ -73,7 +73,16 @@ struct ImageGenerationView: View {
                     labeledContent(for: .prompt, value: prompt)
                     labeledContent(for: .negativePrompt, value: negativePrompt)
                     labeledContent(for: .stepCount, value: String(stepCount))
-                    labeledContent(for: .guidanceScale, value: String(guidanceScale))
+
+                    let guidanceFormat = String(format: "%.1f", arguments: [guidanceScale])
+                    labeledContent(for: .guidanceScale, value: guidanceFormat)
+
+                    Toggle("Randomize seed", isOn: $isSeedRandom)
+                        .tint(UI.tintColor)
+
+                    if !isSeedRandom {
+                        labeledContent(for: .seed, value: String(seed))
+                    }
                 }
             }
             .scrollIndicators(.hidden)
@@ -125,7 +134,7 @@ private extension ImageGenerationView {
                     stepCount: stepCount,
                     guidanceScale: guidanceScale,
                     seed: UInt32(seed),
-                    shouldRandomize: shouldRandomize
+                    isSeedRandom: isSeedRandom
                 )
             )
         }
@@ -219,7 +228,27 @@ private extension ImageGenerationView {
                 max: 50.0,
                 number: stepDouble
             )
-        default: EmptyView()
+        case .guidanceScale:
+            NumberEntryView(
+                title: Modal.guidanceScale.title,
+                min: 1.0,
+                max: 20.0,
+                isDecimalShown: true,
+                number: $guidanceScale
+            )
+        case .seed:
+            let seedDouble = Binding<Double>(
+                get: { Double($seed.wrappedValue) },
+                set: { $seed.wrappedValue = Int($0) })
+
+            NumberEntryView(
+                title: Modal.seed.title,
+                min: 0.0,
+                max: 50000.0,
+                isSliderEnabled: false,
+                isKeyboardEnabled: true,
+                number: seedDouble
+            )
         }
     }
 }
