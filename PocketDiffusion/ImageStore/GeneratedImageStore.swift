@@ -23,18 +23,20 @@ public protocol GeneratedImageStoring {
 }
 
 public enum GenerationState {
-    /// Nothing is currently happening
-    case idle
+    /// Startup state
+    case initial
     /// Waiting for models to load or generator to become ready
     case waiting
     /// Generation is underway and images are actively being received
     case receiving
+    /// Idle state after generation completes
+    case done
 }
 
 @Observable
 final class GeneratedImageStore<Generator: Generating>: GeneratedImageStoring {
 
-    private(set) var state: GenerationState = .idle
+    private(set) var state: GenerationState = .initial
 
     var previewImage: UIImage = .placeholder
     private(set) var storedImages: [GeneratedImage] = []
@@ -65,7 +67,7 @@ final class GeneratedImageStore<Generator: Generating>: GeneratedImageStoring {
             }
 
             Timer.shared.stopTimer(type: .imageGeneration)
-            state = .idle
+            state = .done
 
             // Last preview image is the final result
             storedImages.append(

@@ -9,6 +9,15 @@ import SwiftUI
 
 private extension UI {
     static let imageHeight: CGFloat = 400.0
+
+    enum DoneIndicator {
+        static let size: CGFloat = 24.0
+        static let shadowRadius: CGFloat = 1.0
+
+        static var frameSize: CGFloat {
+            imageHeight * 6/7
+        }
+    }
 }
 
 struct ImageGenerationView: View {
@@ -87,7 +96,10 @@ private extension ImageGenerationView {
 
     @ViewBuilder
     private var generatorButton: some View {
-        Button("Generate", role: nil) {
+        let isInProgress = imageStore.state == .waiting || imageStore.state == .receiving
+        let title = isInProgress ? "In progress" : "Generate"
+
+        Button(title, role: nil) {
             imageStore.generateImages(
                 with: GenerationParameters(
                     prompt: prompt == .promptPlaceholder ? "" : prompt,
@@ -99,6 +111,7 @@ private extension ImageGenerationView {
                 )
             )
         }
+        .disabled(isInProgress)
         .controlSize(.large)
         .buttonStyle(.glass)
     }
@@ -126,6 +139,17 @@ private extension ImageGenerationView {
                 ProgressView(loadingMessage)
                     .progressViewStyle(CircularProgressViewStyle())
                     .centeredInFrame()
+            }
+            if imageStore.state == .done {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: UI.DoneIndicator.size))
+                    .shadow(radius: UI.DoneIndicator.shadowRadius)
+                    .transition(.symbolEffect)
+                    .frame(
+                        maxWidth: UI.DoneIndicator.frameSize,
+                        maxHeight: UI.DoneIndicator.frameSize,
+                        alignment: .topTrailing
+                    )
             }
         }
     }

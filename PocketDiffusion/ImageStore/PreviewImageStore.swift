@@ -10,9 +10,9 @@ import UIKit
 @Observable
 final class PreviewImageStore: GeneratedImageStoring {
 
-    var state: GenerationState = .idle
+    var state: GenerationState = .initial
 
-    var previewImage: UIImage = .image(color: .gray)
+    var previewImage: UIImage = .placeholder
 
     var storedImages: [GeneratedImage] = [
         .init(uiImage: .image(color: .darkGray), params: .defaultValues),
