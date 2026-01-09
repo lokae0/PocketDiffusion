@@ -53,7 +53,7 @@ struct PromptEditView: View {
                     dismiss()
                 }
             } label: {
-                Label("Cancel", systemImage: "xmark")
+                Label("Cancel", systemImage: UI.Symbol.xmark)
             }
             .alert("Discard changes?", isPresented: $showCancelAlert) {
                 Button(role: .destructive) {
@@ -75,7 +75,7 @@ struct PromptEditView: View {
             Button {
                 dismiss()
             } label: {
-                Label("Save", systemImage: "checkmark")
+                Label("Save", systemImage: UI.Symbol.checkmark)
             }
             .disabled(text.isEmpty)
         }
@@ -87,7 +87,7 @@ struct PromptEditView: View {
             Button {
                 showEraseAlert = true
             } label: {
-                Label("Erase", systemImage: "eraser")
+                Label("Erase", systemImage: UI.Symbol.eraser)
             }
             .disabled(text.isEmpty)
             .alert("Erase all content?", isPresented: $showEraseAlert) {

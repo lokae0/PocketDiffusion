@@ -141,7 +141,7 @@ private extension ImageGenerationView {
                     .centeredInFrame()
             }
             if imageStore.state == .done {
-                Image(systemName: "checkmark.circle.fill")
+                Image(systemName: UI.Symbol.checkmarkCircleFill)
                     .font(.system(size: UI.DoneIndicator.size))
                     .shadow(radius: UI.DoneIndicator.shadowRadius)
                     .transition(.symbolEffect)

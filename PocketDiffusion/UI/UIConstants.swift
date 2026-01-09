@@ -15,6 +15,13 @@ enum UI {
         static let medium: CGFloat = 16.0
         static let large: CGFloat = 32.0
     }
+
+    enum Symbol {
+        static let checkmark = "checkmark"
+        static let checkmarkCircleFill = "checkmark.circle.fill"
+        static let eraser = "eraser"
+        static let xmark = "xmark"
+    }
 }
 
 extension String {
