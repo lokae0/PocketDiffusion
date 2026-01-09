@@ -31,12 +31,12 @@ struct ImageGenerationView: View {
         imageStore.state == .waiting || imageStore.state == .receiving
     }
 
-    @State private var prompt: String = .promptPlaceholder
-    @State private var negativePrompt: String = .promptPlaceholder
-    @State private var stepCount: Int = 25
-    @State private var guidanceScale: Int = 11
-    @State private var seed: UInt32 = 0
-    @State private var shouldRandomize: Bool = true
+    @AppStorage("prompt") private var prompt: String = .promptPlaceholder
+    @AppStorage("negativePrompt") private var negativePrompt: String = .promptPlaceholder
+    @AppStorage("stepCount") private var stepCount: Int = 25
+    @AppStorage("guidanceScale") private var guidanceScale: Int = 11
+    @AppStorage("seed") private var seed: Int = 0
+    @AppStorage("shouldRandomize") private var shouldRandomize: Bool = true
 
     @State private var shownModal: Modal?
 
@@ -124,7 +124,7 @@ private extension ImageGenerationView {
                     negativePrompt: negativePrompt == .promptPlaceholder ? "" : prompt,
                     stepCount: stepCount,
                     guidanceScale: guidanceScale,
-                    seed: seed,
+                    seed: UInt32(seed),
                     shouldRandomize: shouldRandomize
                 )
             )
