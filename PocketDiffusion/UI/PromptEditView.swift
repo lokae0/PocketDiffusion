@@ -5,7 +5,6 @@
 //  Created by Ian Luo on 1/7/26.
 //
 
-import Combine
 import SwiftUI
 
 struct PromptEditView: View {
@@ -42,9 +41,12 @@ struct PromptEditView: View {
             isFocused = true
         }
     }
+}
+
+private extension PromptEditView {
 
     @ToolbarContentBuilder
-    private var cancelToolbarItem: some ToolbarContent {
+    var cancelToolbarItem: some ToolbarContent {
         ToolbarItem(placement: .cancellationAction) {
             Button {
                 if text != originalText {
@@ -70,7 +72,7 @@ struct PromptEditView: View {
     }
 
     @ToolbarContentBuilder
-    private var saveToolBarItem: some ToolbarContent {
+    var saveToolBarItem: some ToolbarContent {
         ToolbarItem(placement: .confirmationAction) {
             Button {
                 dismiss()
@@ -82,7 +84,7 @@ struct PromptEditView: View {
     }
 
     @ToolbarContentBuilder
-    private var eraseToolbarItem: some ToolbarContent {
+    var eraseToolbarItem: some ToolbarContent {
         ToolbarItem(placement: .navigation) {
             Button {
                 showEraseAlert = true

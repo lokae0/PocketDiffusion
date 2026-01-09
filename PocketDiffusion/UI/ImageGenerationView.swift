@@ -114,7 +114,7 @@ struct ImageGenerationView: View {
 private extension ImageGenerationView {
 
     @ViewBuilder
-    private var generatorButton: some View {
+    var generatorButton: some View {
         let title = isGenInProgress ? "In progress..." : "Generate"
 
         Button(title, role: nil) {
@@ -136,7 +136,7 @@ private extension ImageGenerationView {
     }
 
     @ViewBuilder
-    private var cancelButton: some View {
+    var cancelButton: some View {
         Button("Cancel", role: .destructive) {
             imageStore.cancelImageGeneration()
         }
@@ -145,7 +145,7 @@ private extension ImageGenerationView {
     }
 
     @ViewBuilder
-    private var previewImage: some View {
+    var previewImage: some View {
         ZStack {
             Image(uiImage: imageStore.previewImage)
                 .resizable()
@@ -207,6 +207,17 @@ private extension ImageGenerationView {
             PromptEditView(
                 title: Modal.negativePrompt.title,
                 text: $negativePrompt
+            )
+        case .stepCount:
+            let stepDouble = Binding<Double>(
+                get: { Double($stepCount.wrappedValue) },
+                set: { $stepCount.wrappedValue = Int($0) })
+
+            NumberEntryView(
+                title: Modal.stepCount.title,
+                min: 1.0,
+                max: 50.0,
+                number: stepDouble
             )
         default: EmptyView()
         }

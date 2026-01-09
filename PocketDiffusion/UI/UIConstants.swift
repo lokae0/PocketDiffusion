@@ -22,6 +22,8 @@ enum UI {
         static let checkmarkCircleFill = "checkmark.circle.fill"
         static let eraser = "eraser"
         static let xmark = "xmark"
+        static let plus = "plus"
+        static let minus = "minus"
     }
 }
 
