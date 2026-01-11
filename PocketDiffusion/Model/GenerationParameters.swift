@@ -15,14 +15,3 @@ public struct GenerationParameters: Hashable, Sendable {
     let guidanceScale: Double
     let seed: UInt32
 }
-
-extension GenerationParameters {
-
-    static let defaultValues = Self(
-        prompt: "",
-        negativePrompt: "",
-        stepCount: 25,
-        guidanceScale: 11.0,
-        seed: 0
-    )
-}

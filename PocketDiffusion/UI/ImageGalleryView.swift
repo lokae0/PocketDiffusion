@@ -8,7 +8,7 @@
 import SwiftUI
 
 private extension UI {
-    static let imageHeight: CGFloat = 200.0
+    static let cellHeight: CGFloat = 160.0
 }
 
 struct ImageGalleryView: View {
@@ -17,12 +17,26 @@ struct ImageGalleryView: View {
 
     var body: some View {
         List(imageStore.storedImages) { storedImage in
-            Image(uiImage: storedImage.uiImage)
-                .resizable()
-                .scaledToFit()
-                .cornerRadius(UI.cornerRadius)
-                .frame(height: UI.imageHeight)
+            HStack(alignment: .top, spacing: UI.Spacing.medium) {
+                Image(uiImage: storedImage.uiImage)
+                    .resizable()
+                    .scaledToFit()
+                    .cornerRadius(UI.cornerRadius)
+
+                VStack(alignment: .leading, spacing: UI.Spacing.small) {
+                    Text(storedImage.params.prompt)
+                        .minimumScaleFactor(0.85)
+
+                    Spacer()
+
+                    Text("Steps: \(storedImage.params.stepCount)")
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .frame(maxHeight: UI.cellHeight)
+            .fixedSize(horizontal: false, vertical: true)
         }
+        .listStyle(.plain)
     }
 }
 
