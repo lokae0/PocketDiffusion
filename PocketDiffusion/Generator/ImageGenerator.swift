@@ -9,7 +9,7 @@ import CoreML
 import StableDiffusion
 import UIKit
 
-public protocol Generating: Actor {
+protocol Generating: Actor {
 
     associatedtype Generated: Sendable
 

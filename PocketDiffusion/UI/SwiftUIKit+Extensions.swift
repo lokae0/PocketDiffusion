@@ -39,3 +39,20 @@ extension View {
         )
     }
 }
+
+extension Binding {
+
+    // https://medium.com/@matgnt/clean-alert-handling-in-swiftui-mapping-optionals-to-presentation-state-acb4df717c01
+    static func isPresent<T>(_ source: Binding<T?>) -> Binding<Bool> {
+        .init(
+            get: {
+                source.wrappedValue != nil
+            },
+            set: { newValue in
+                if !newValue {
+                    source.wrappedValue = nil
+                }
+            }
+        )
+    }
+}

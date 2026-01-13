@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct GenerationParameters: Hashable, Sendable {
+struct GenerationParameters: Hashable, Sendable, Codable {
 
     let prompt: String
     let negativePrompt: String
