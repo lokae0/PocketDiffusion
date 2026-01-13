@@ -43,7 +43,7 @@ extension View {
 extension Binding {
 
     // https://medium.com/@matgnt/clean-alert-handling-in-swiftui-mapping-optionals-to-presentation-state-acb4df717c01
-    static func isPresent<T>(_ source: Binding<T?>) -> Binding<Bool> {
+    static func isPresent<T>(_ source: Binding<T?>) -> Binding<Bool> where Value == Bool {
         .init(
             get: {
                 source.wrappedValue != nil
@@ -53,6 +53,13 @@ extension Binding {
                     source.wrappedValue = nil
                 }
             }
+        )
+    }
+
+    static func fromInt(_ source: Binding<Int>) -> Binding<Double> where Value == Double {
+        .init(
+            get: { Double(source.wrappedValue) },
+            set: { source.wrappedValue = Int($0) }
         )
     }
 }

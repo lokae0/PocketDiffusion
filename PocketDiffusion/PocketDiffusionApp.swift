@@ -40,13 +40,13 @@ struct PocketDiffusionApp: App {
             for file in directoryContents {
                 do {
                     try fileManager.removeItem(at: file)
+                    Log.shared.info("Deleted: \(file.lastPathComponent)")
                 } catch let error as NSError {
                     Log.shared.info(
-                        "Error removing cache file \(file.lastPathComponent): \(error.localizedDescription)"
+                        "Error deleting \(file.lastPathComponent): \(error.localizedDescription)"
                     )
                 }
             }
-            Log.shared.info("Cache cleared successfully")
         } catch {
             Log.shared.info(
                 "Error accessing cache directory: \(error.localizedDescription)"

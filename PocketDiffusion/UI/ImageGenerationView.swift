@@ -226,15 +226,11 @@ private extension ImageGenerationView {
                 text: $negativePrompt
             )
         case .stepCount:
-            let stepDouble = Binding<Double>(
-                get: { Double($stepCount.wrappedValue) },
-                set: { $stepCount.wrappedValue = Int($0) })
-
             NumberEntryView(
                 title: Modal.stepCount.title,
                 min: 1.0,
                 max: 50.0,
-                number: stepDouble
+                number: .fromInt($stepCount)
             )
         case .guidanceScale:
             NumberEntryView(
@@ -245,17 +241,13 @@ private extension ImageGenerationView {
                 number: $guidanceScale
             )
         case .seed:
-            let seedDouble = Binding<Double>(
-                get: { Double($seed.wrappedValue) },
-                set: { $seed.wrappedValue = Int($0) })
-
             NumberEntryView(
                 title: Modal.seed.title,
                 min: 0.0,
                 max: Double(UInt32.max),
                 isSliderEnabled: false,
                 isKeyboardEnabled: true,
-                number: seedDouble
+                number: .fromInt($seed)
             )
         }
     }
