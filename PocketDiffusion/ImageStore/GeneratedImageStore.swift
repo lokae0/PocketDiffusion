@@ -54,6 +54,8 @@ where Generator: Generating,
     private let imageGenerator: Generator
     private let persistence: Persistence
 
+    private var generationTask: Task<Void, Never>?
+
     init(
         imageGenerator: Generator = ImageGenerator(),
         persistence: Persistence = FilePersistence()
@@ -71,20 +73,24 @@ where Generator: Generating,
         previewImage = .placeholder
         Timer.shared.startTimer(type: .awaitingPipeline)
 
-        Task {
+        generationTask = Task {
             for await generated in await imageGenerator.generate(with: params) {
                 guard let uiImage = generated as? UIImage else {
                     Log.shared.info("Unexpected type for generated image!!")
                     continue
                 }
                 Log.shared.currentThread(
-                    for: "Receiving preview images",
+                    "Receiving preview images",
                     isEnabled: false
                 )
                 state = .receiving
                 previewImage = uiImage
             }
 
+            guard !Task.isCancelled else {
+                Timer.shared.stopTimer(type: .imageGeneration, shouldLog: false)
+                return
+            }
             Timer.shared.stopTimer(type: .imageGeneration)
             state = .done
 
@@ -99,7 +105,14 @@ where Generator: Generating,
         }
     }
 
-    func cancelImageGeneration() {}
+    func cancelImageGeneration() {
+        generationTask?.cancel()
+        previewImage = .placeholder
+        state = .idle
+
+        Log.shared.info("Cancel requested...")
+
+    }
 
     private func save() async throws(PersistenceError) {
         try await persistence.save(model: storedImages)

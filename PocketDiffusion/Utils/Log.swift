@@ -29,7 +29,7 @@ nonisolated final class Log: Sendable {
         fatalError("\(currentTime) \(message)")
     }
 
-    func currentThread(for event: String, isEnabled: Bool = true) {
+    func currentThread(_ event: String, isEnabled: Bool = true) {
         if isEnabled {
             print("\(currentTime) \(event) on: \(Thread.current)")
         }

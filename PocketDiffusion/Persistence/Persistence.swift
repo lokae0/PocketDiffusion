@@ -58,7 +58,7 @@ actor FilePersistence: Persisting {
     }
 
     func save(model: Model) throws(PersistenceError) {
-        Log.shared.currentThread(for: "Saving to disk", isEnabled: false)
+        Log.shared.currentThread("Saving to disk", isEnabled: false)
         do {
             // No-op if directory already exists
             try fileManager.createDirectory(
@@ -77,7 +77,7 @@ actor FilePersistence: Persisting {
     }
 
     func restore() throws(PersistenceError) -> Model {
-        Log.shared.currentThread(for: "Restoring from disk", isEnabled: false)
+        Log.shared.currentThread("Restoring from disk", isEnabled: false)
 
         guard fileManager.fileExists(atPath: fileUrl.path) else {
             return []

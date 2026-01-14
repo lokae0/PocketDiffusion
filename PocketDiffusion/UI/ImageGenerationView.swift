@@ -25,7 +25,7 @@ struct ImageGenerationView: View {
     @Binding var imageStore: GeneratedImageStoring
 
     // TODO: remove once it's working
-    private let debugShowCancelButton = false
+    private let debugShowCancelButton = true
 
     private var isGenInProgress: Bool {
         imageStore.state == .waiting || imageStore.state == .receiving
@@ -94,19 +94,13 @@ struct ImageGenerationView: View {
                 content: content(for:)
             )
 
-            HStack {
-                generatorButton
-
-                if isGenInProgress && debugShowCancelButton {
-                    cancelButton
-                }
-            }
-            .padding(.bottom, UI.Spacing.large)
-            .frame(
-                maxWidth: .infinity,
-                maxHeight: .infinity,
-                alignment: .bottom
-            )
+            primaryAction
+                .padding(.bottom, UI.Spacing.large)
+                .frame(
+                    maxWidth: .infinity,
+                    maxHeight: .infinity,
+                    alignment: .bottom
+                )
         }
         .alert(
             imageStore.errorInfo?.title ?? "Oh no",
@@ -132,10 +126,11 @@ struct ImageGenerationView: View {
 private extension ImageGenerationView {
 
     @ViewBuilder
-    var generatorButton: some View {
-        let title = isGenInProgress ? "In progress..." : "Generate"
+    var primaryAction: some View {
+        let inProgressTitle = debugShowCancelButton ? "Cancel" : "In progress..."
+        let title = isGenInProgress ? inProgressTitle : "Generate"
 
-        Button(title, role: nil) {
+        let generateAction = {
             imageStore.generateImages(
                 with: GenerationParameters(
                     prompt: prompt == .promptPlaceholder ? "" : prompt,
@@ -146,19 +141,15 @@ private extension ImageGenerationView {
                 )
             )
         }
-        .disabled(isGenInProgress)
+        Button(
+            title,
+            role: nil,
+            action: isGenInProgress ? imageStore.cancelImageGeneration : generateAction
+        )
+        .disabled(isGenInProgress && !debugShowCancelButton)
         .controlSize(.large)
         .buttonStyle(.glass)
-        .tint(UI.tintColor)
-    }
-
-    @ViewBuilder
-    var cancelButton: some View {
-        Button("Cancel", role: .destructive) {
-            imageStore.cancelImageGeneration()
-        }
-        .controlSize(.large)
-        .buttonStyle(.glass)
+        .tint(isGenInProgress ? nil : UI.tintColor)
     }
 
     @ViewBuilder

@@ -23,14 +23,16 @@ final actor ImageGenerator: Generating {
 
     private let pipeline: StableDiffusionPipeline
 
+    private let loggingPrefix: String = "IG - "
+
     init() {
-        let fatalLoadMessage = "Unable to load Stable Diffusion model resources"
+        let fatalLoadMessage = loggingPrefix + "Unable to load Stable Diffusion model resources"
 
         guard let modelUrl = Bundle.main.url(forResource: "StableDiffusionModel", withExtension: nil) else {
             Log.shared.fatal(fatalLoadMessage)
         }
         do {
-            Log.shared.currentThread(for: "Setting up image generator pipeline")
+            Log.shared.currentThread(loggingPrefix + "Setting up image generator pipeline")
 
             let mlConfig = MLModelConfiguration()
             mlConfig.computeUnits = .cpuAndNeuralEngine
@@ -46,7 +48,7 @@ final actor ImageGenerator: Generating {
                 await prewarm()
             }
             Log.shared.currentThread(
-                for: "Ending image generator setup",
+                loggingPrefix + "Ending image generator setup",
                 isEnabled: false
             )
         } catch {
@@ -64,25 +66,53 @@ final actor ImageGenerator: Generating {
             config.useDenoisedIntermediates = true
             config.schedulerType = .dpmSolverMultistepScheduler
 
-            Task {
-                await Timer.shared.stopTimer(type: .awaitingPipeline)
-                Log.shared.currentThread(for: "Calling pipeline.generateImages with params: \(params)")
+            let cancellationMessage = loggingPrefix + "Generation cancelled"
 
+            let generationTask = Task {
+                await Timer.shared.stopTimer(type: .awaitingPipeline)
+
+                // Handle cancellations that occur during prewarming
+                guard !Task.isCancelled else {
+                    Log.shared.info(cancellationMessage)
+                    return
+                }
+                Log.shared.currentThread(
+                    loggingPrefix + "Calling `pipeline.generateImages` with params: \(params)"
+                )
                 await Timer.shared.startTimer(type: .imageGeneration)
                 // TODO: handle errors
                 let _ = try! pipeline.generateImages(configuration: config) { progress in
+                    // Handle cancellations that occur during image generation
+                    guard !Task.isCancelled else {
+                        Log.shared.info(cancellationMessage)
+                        continuation.finish()
+                        return false
+                    }
                     // Return stream of images as they're generated
                     if let currentImage = progress.currentImages.compactMap({ $0 }).last {
-                        Log.shared.info("Step: \(progress.step)")
+                        Log.shared.info(loggingPrefix + "Step: \(progress.step)")
                         continuation.yield(UIImage(cgImage: currentImage))
                     }
-
                     // Check if we're done
                     if progress.step == progress.stepCount - 1 {
-                        Log.shared.info("Finished generating")
+                        Log.shared.info(loggingPrefix + "Finished generating")
                         continuation.finish()
                     }
                     return true
+                }
+            }
+
+            continuation.onTermination = { termination in
+                switch termination {
+                case .cancelled:
+                    Log.shared.currentThread(
+                        self.loggingPrefix + "`continuation.onTermination` canceling generationTask"
+                    )
+                    generationTask.cancel()
+                case .finished:
+                    break
+                @unknown default:
+                    break
                 }
             }
         }
@@ -90,11 +120,10 @@ final actor ImageGenerator: Generating {
 
     private func prewarm() async {
         do {
-            Log.shared.currentThread(for: "Prewarming started")
+            Log.shared.currentThread("Prewarming started")
             try pipeline.prewarmResources()
         } catch {
             Log.shared.info("Prewarming failed!!")
         }
     }
 }
-
