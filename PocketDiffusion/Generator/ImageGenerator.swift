@@ -14,7 +14,7 @@ protocol Generating: Actor {
     associatedtype Generated: Sendable
 
     /// Loads models if required and begins generation when ready
-    func generate(with params: GenerationParameters) -> AsyncStream<Generated>
+    func generate(with params: GenerationParameters) throws -> AsyncStream<Generated>
 }
 
 final actor ImageGenerator: Generating {
@@ -56,7 +56,7 @@ final actor ImageGenerator: Generating {
         }
     }
 
-    func generate(with params: GenerationParameters) -> AsyncStream<Generated> {
+    func generate(with params: GenerationParameters) throws -> AsyncStream<Generated> {
         AsyncStream { continuation in
             var config = StableDiffusionPipeline.Configuration(prompt: params.prompt)
             config.negativePrompt = params.negativePrompt
@@ -80,8 +80,7 @@ final actor ImageGenerator: Generating {
                     loggingPrefix + "Calling `pipeline.generateImages` with params: \(params)"
                 )
                 await Timer.shared.startTimer(type: .imageGeneration)
-                // TODO: handle errors
-                let _ = try! pipeline.generateImages(configuration: config) { progress in
+                let _ = try pipeline.generateImages(configuration: config) { progress in
                     // Handle cancellations that occur during image generation
                     guard !Task.isCancelled else {
                         Log.shared.info(cancellationMessage)

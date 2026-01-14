@@ -74,17 +74,25 @@ where Generator: Generating,
         Timer.shared.startTimer(type: .awaitingPipeline)
 
         generationTask = Task {
-            for await generated in await imageGenerator.generate(with: params) {
-                guard let uiImage = generated as? UIImage else {
-                    Log.shared.info("Unexpected type for generated image!!")
-                    continue
+            do {
+                for await generated in try await imageGenerator.generate(with: params) {
+                    guard let uiImage = generated as? UIImage else {
+                        Log.shared.info("Unexpected type for generated image!!")
+                        continue
+                    }
+                    Log.shared.currentThread(
+                        "Receiving preview images",
+                        isEnabled: false
+                    )
+                    state = .receiving
+                    previewImage = uiImage
                 }
-                Log.shared.currentThread(
-                    "Receiving preview images",
-                    isEnabled: false
+            } catch {
+                errorInfo = ErrorInfo(
+                    title: "Image generation failed",
+                    message: "Please try again"
                 )
-                state = .receiving
-                previewImage = uiImage
+                Log.shared.info("Image generation error: \(error.localizedDescription)")
             }
 
             guard !Task.isCancelled else {
