@@ -64,9 +64,7 @@ private extension PromptEditView {
                 } label: {
                     Text("Discard")
                 }
-                Button("Cancel", role: .cancel) {
-                    showCancelAlert = false
-                }
+                Button("Cancel", role: .cancel) {}
             }
         }
     }
@@ -98,9 +96,7 @@ private extension PromptEditView {
                 } label: {
                     Text("Erase")
                 }
-                Button("Cancel", role: .cancel) {
-                    showEraseAlert = false
-                }
+                Button("Cancel", role: .cancel) {}
             }
         }
     }

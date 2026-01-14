@@ -24,9 +24,6 @@ struct ImageGenerationView: View {
 
     @Binding var imageStore: GeneratedImageStoring
 
-    // TODO: remove once it's working
-    private let debugShowCancelButton = true
-
     private var isGenInProgress: Bool {
         imageStore.state == .waiting || imageStore.state == .receiving
     }
@@ -39,6 +36,7 @@ struct ImageGenerationView: View {
     @AppStorage("isSeedRandom") private var isSeedRandom: Bool = true
 
     @State private var shownModal: Modal?
+    @State private var isCancelAlertShown: Bool = false
 
     private enum Modal: String, Identifiable {
         case prompt
@@ -127,9 +125,14 @@ private extension ImageGenerationView {
 
     @ViewBuilder
     var primaryAction: some View {
-        let inProgressTitle = debugShowCancelButton ? "Cancel" : "In progress..."
-        let title = isGenInProgress ? inProgressTitle : "Generate"
-
+        let cancelAction = {
+            // Allow immediate cancellation during prewarming
+            if imageStore.state == .waiting {
+                imageStore.cancelImageGeneration()
+            } else {
+                isCancelAlertShown = true
+            }
+        }
         let generateAction = {
             imageStore.generateImages(
                 with: GenerationParameters(
@@ -142,14 +145,25 @@ private extension ImageGenerationView {
             )
         }
         Button(
-            title,
+            isGenInProgress ? "Cancel" : "Generate",
             role: nil,
-            action: isGenInProgress ? imageStore.cancelImageGeneration : generateAction
+            action: isGenInProgress ? cancelAction : generateAction
         )
-        .disabled(isGenInProgress && !debugShowCancelButton)
         .controlSize(.large)
         .buttonStyle(.glass)
         .tint(isGenInProgress ? nil : UI.tintColor)
+        .alert("Are you sure you want to cancel generating?", isPresented: $isCancelAlertShown) {
+            Button("Confirm", role: .destructive) {
+                imageStore.cancelImageGeneration()
+            }
+            Button("Nevermind", role: .cancel) {}
+        }
+        .onChange(of: imageStore.state) { oldValue, newValue in
+            // Hide the alert if generation finishes before user input is received
+            if oldValue == .receiving && newValue == .done {
+                isCancelAlertShown = false
+            }
+        }
     }
 
     @ViewBuilder

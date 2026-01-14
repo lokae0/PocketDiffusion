@@ -34,7 +34,6 @@ struct NumberEntryView: View {
     @FocusState private var isFocused: Bool
 
     @State private var showCancelAlert: Bool = false
-    @State private var showEraseAlert: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -133,9 +132,7 @@ private extension NumberEntryView {
                 } label: {
                     Text("Discard")
                 }
-                Button("Cancel", role: .cancel) {
-                    showCancelAlert = false
-                }
+                Button("Cancel", role: .cancel) {}
             }
         }
     }
