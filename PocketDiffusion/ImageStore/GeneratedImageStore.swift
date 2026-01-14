@@ -99,14 +99,15 @@ where Generator: Generating,
                 Timer.shared.stopTimer(type: .imageGeneration, shouldLog: false)
                 return
             }
-            Timer.shared.stopTimer(type: .imageGeneration)
+            let duration = Timer.shared.stopTimer(type: .imageGeneration)
             state = .done
 
             // Last preview image is the final result
             storedImages.append(
                 GeneratedImage(
                     uiImage: previewImage,
-                    params: params
+                    params: params,
+                    duration: duration
                 )
             )
             await tryPersistence(save)

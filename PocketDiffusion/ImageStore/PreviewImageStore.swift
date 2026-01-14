@@ -30,7 +30,8 @@ final class PreviewImageStore: GeneratedImageStoring {
                     stepCount: 25,
                     guidanceScale: 11.0,
                     seed: 0
-                )
+                ),
+                duration: 5.897
             ),
             .init(
                 uiImage: .image(color: .lightGray),
@@ -40,7 +41,8 @@ final class PreviewImageStore: GeneratedImageStoring {
                     stepCount: 8,
                     guidanceScale: 2.3,
                     seed: UInt32.max
-                )
+                ),
+                duration: 50.2374235
             ),
             .init(
                 uiImage: .image(color: .gray),
@@ -50,7 +52,8 @@ final class PreviewImageStore: GeneratedImageStoring {
                     stepCount: 8,
                     guidanceScale: 2.3,
                     seed: 52916723
-                )
+                ),
+                duration: 500.29385771865
             ),
         ],
         isErrorShown: Bool = false
