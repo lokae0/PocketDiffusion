@@ -10,6 +10,8 @@ import SwiftUI
 private extension UI {
     static let numberSize: CGFloat = 36.0
     static let widthScalar: CGFloat = 0.75
+    static let fractionLength: Int = 1
+    static let minScaleFactor: CGFloat = 0.5
 
     enum Stepper {
         static let width: CGFloat = 68.0
@@ -79,12 +81,12 @@ private extension NumberEntryView {
     var numberTextField: some View {
         let type: UIKeyboardType = isDecimalShown ? .decimalPad : .numberPad
         let format: FloatingPointFormatStyle<Double> = isDecimalShown ?
-            .number.precision(.fractionLength((1))) :
+            .number.precision(.fractionLength((UI.fractionLength))) :
             .number
 
         TextField("", value: $number, format: format)
             .disabled(isKeyboardEnabled == false)
-            .minimumScaleFactor(0.5)
+            .minimumScaleFactor(UI.minScaleFactor)
             .keyboardType(type)
             .font(.system(size: UI.numberSize))
             .multilineTextAlignment(.center)

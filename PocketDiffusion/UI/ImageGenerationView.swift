@@ -191,18 +191,25 @@ private extension ImageGenerationView {
                     .centeredInFrame()
             }
             if imageStore.state == .done {
-                Image(systemName: UI.Symbol.checkmarkCircleFill)
-                    .font(.system(size: UI.DoneIndicator.size))
-                    .foregroundStyle(UI.tintColor)
-                    .background(.white)
-                    .cornerRadius(UI.DoneIndicator.size)
-                    .shadow(radius: UI.DoneIndicator.shadowRadius)
-                    .transition(.symbolEffect)
-                    .frame(
-                        maxWidth: UI.DoneIndicator.frameSize,
-                        maxHeight: UI.DoneIndicator.frameSize,
-                        alignment: .topTrailing
-                    )
+                VStack(alignment: .trailing) {
+                    Image(systemName: UI.Symbol.checkmarkCircleFill)
+                        .font(.system(size: UI.DoneIndicator.size))
+                        .foregroundStyle(UI.tintColor)
+                        .background(.white)
+                        .cornerRadius(UI.DoneIndicator.size)
+                        .transition(.symbolEffect)
+
+                    if let duration = imageStore.storedImages.last?.durationString {
+                        Text(duration)
+                            .padding(.top, UI.Spacing.extraSmall)
+                    }
+                }
+                .shadow(radius: UI.DoneIndicator.shadowRadius)
+                .frame(
+                    maxWidth: UI.DoneIndicator.frameSize,
+                    maxHeight: UI.DoneIndicator.frameSize,
+                    alignment: .topTrailing
+                )
             }
         }
     }

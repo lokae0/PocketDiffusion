@@ -12,6 +12,7 @@ enum UI {
     static let tintColor: Color = .pink
 
     enum Spacing {
+        static let extraSmall: CGFloat = 4.0
         static let small: CGFloat = 8.0
         static let medium: CGFloat = 16.0
         static let large: CGFloat = 32.0
