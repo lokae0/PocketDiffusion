@@ -8,14 +8,18 @@
 import SwiftUI
 
 private extension UI {
-    static let imageHeight: CGFloat = 400.0
+    static let imageHeight: CGFloat = 512.0
 
     enum DoneIndicator {
         static let size: CGFloat = 24.0
         static let shadowRadius: CGFloat = 1.0
 
-        static var frameSize: CGFloat {
-            imageHeight * 6/7
+        static func frameSize(parentSize: CGSize) -> CGSize {
+            let scalar = 0.85
+            return .init(
+                width: parentSize.width * scalar,
+                height: parentSize.height * scalar
+            )
         }
     }
 }
@@ -35,6 +39,7 @@ struct ImageGenerationView: View {
     @AppStorage("seed") private var seed: Int = 0
     @AppStorage("isSeedRandom") private var isSeedRandom: Bool = true
 
+    @State private var previewImageSize: CGSize = .zero
     @State private var shownModal: Modal?
     @State private var isCancelAlertShown: Bool = false
 
@@ -65,6 +70,7 @@ struct ImageGenerationView: View {
                     previewImage
                         .listRowBackground(Color.clear)
                         .listRowInsets(EdgeInsets())
+                        .centeredInFrame()
                 }
 
                 Section {
@@ -173,7 +179,12 @@ private extension ImageGenerationView {
                 .resizable()
                 .scaledToFit()
                 .cornerRadius(UI.cornerRadius)
-                .frame(height: UI.imageHeight)
+                .frame(maxWidth: UI.imageHeight, maxHeight: UI.imageHeight)
+                .onGeometryChange(for: CGSize.self) { proxy in
+                    return proxy.size
+                } action: { newSize in
+                    previewImageSize = newSize
+                }
 
             let loadingMessage = [
                 "Reticulating splines...",
@@ -191,6 +202,8 @@ private extension ImageGenerationView {
                     .centeredInFrame()
             }
             if imageStore.state == .done {
+                let frameSize = UI.DoneIndicator.frameSize(parentSize: previewImageSize)
+
                 VStack(alignment: .trailing) {
                     Image(systemName: UI.Symbol.checkmarkCircleFill)
                         .font(.system(size: UI.DoneIndicator.size))
@@ -206,8 +219,8 @@ private extension ImageGenerationView {
                 }
                 .shadow(radius: UI.DoneIndicator.shadowRadius)
                 .frame(
-                    maxWidth: UI.DoneIndicator.frameSize,
-                    maxHeight: UI.DoneIndicator.frameSize,
+                    width: frameSize.width,
+                    height: frameSize.height,
                     alignment: .topTrailing
                 )
             }
