@@ -36,13 +36,6 @@ struct ImageGenerationView: View {
         imageStore.state == .waiting || imageStore.state == .receiving
     }
 
-    @AppStorage("prompt") private var prompt: String = .promptPlaceholder
-    @AppStorage("negativePrompt") private var negativePrompt: String = .promptPlaceholder
-    @AppStorage("stepCount") private var stepCount: Int = 25
-    @AppStorage("guidanceScale") private var guidanceScale: Double = 11
-    @AppStorage("seed") private var seed: Int = 0
-    @AppStorage("isSeedRandom") private var isSeedRandom: Bool = true
-
     @State private var previewImageSize: CGSize = .zero
     @State private var shownModal: Modal?
     @State private var isCancelAlertShown: Bool = false
@@ -78,27 +71,30 @@ struct ImageGenerationView: View {
                 }
 
                 Section {
-                    labeledContent(for: .prompt, value: prompt)
-                    labeledContent(for: .negativePrompt, value: negativePrompt)
-                    labeledContent(for: .stepCount, value: String(stepCount))
+                    let prompt = imageStore.prompt
+                    let promptValue = prompt.isEmpty ? .promptPlaceholder : prompt
+                    labeledContent(for: .prompt, value: promptValue)
 
-                    let guidanceFormat = String(format: "%.1f", arguments: [guidanceScale])
+                    let negativePrompt = imageStore.negativePrompt
+                    let negativePromptValue = negativePrompt.isEmpty ? .promptPlaceholder : negativePrompt
+                    labeledContent(for: .negativePrompt, value: negativePromptValue)
+
+                    labeledContent(for: .stepCount, value: String(imageStore.stepCount))
+
+                    let guidanceFormat = String(format: "%.1f", arguments: [imageStore.guidanceScale])
                     labeledContent(for: .guidanceScale, value: guidanceFormat)
 
-                    Toggle("Randomize seed", isOn: $isSeedRandom)
+                    Toggle("Randomize seed", isOn: $imageStore.isSeedRandom)
                         .tint(UI.tintColor)
 
-                    if !isSeedRandom {
-                        labeledContent(for: .seed, value: String(seed))
+                    if !imageStore.isSeedRandom {
+                        labeledContent(for: .seed, value: String(imageStore.seed))
                     }
                 }
             }
             .scrollIndicators(.hidden)
             .sheet(
                 item: $shownModal,
-                onDismiss: {
-                    withAnimation(.easeInOut) { handleEmptyPrompts() }
-                },
                 content: content(for:)
             )
 
@@ -120,15 +116,6 @@ struct ImageGenerationView: View {
             Text(info.message)
         }
     }
-
-    private func handleEmptyPrompts() {
-        if prompt.isEmpty {
-            prompt = .promptPlaceholder
-        }
-        if negativePrompt.isEmpty {
-            negativePrompt = .promptPlaceholder
-        }
-    }
 }
 
 private extension ImageGenerationView {
@@ -143,21 +130,10 @@ private extension ImageGenerationView {
                 isCancelAlertShown = true
             }
         }
-        let generateAction = {
-            imageStore.generateImages(
-                with: GenerationParameters(
-                    prompt: prompt == .promptPlaceholder ? "" : prompt,
-                    negativePrompt: negativePrompt == .promptPlaceholder ? "" : negativePrompt,
-                    stepCount: stepCount,
-                    guidanceScale: guidanceScale,
-                    seed: isSeedRandom ? UInt32.random(in: 0..<UInt32.max) : UInt32(seed),
-                )
-            )
-        }
         Button(
             isGenInProgress ? "Cancel" : "Generate",
             role: nil,
-            action: isGenInProgress ? cancelAction : generateAction
+            action: isGenInProgress ? cancelAction : imageStore.generateImages
         )
         .controlSize(.large)
         .buttonStyle(.glass)
@@ -208,7 +184,7 @@ private extension ImageGenerationView {
 
             let frameSize = UI.DoneIndicator.frameSize(parentSize: previewImageSize)
             if imageStore.state == .receiving, let currentStep = imageStore.currentStep {
-                Text("Steps completed: \(currentStep + 1) of \(stepCount)")
+                Text("Steps completed: \(currentStep + 1) of \(imageStore.stepCount)")
                     .font(.system(.footnote))
                     .background(
                         Rectangle()
@@ -264,19 +240,19 @@ private extension ImageGenerationView {
         case .prompt:
             PromptEditView(
                 title: Modal.prompt.title,
-                text: $prompt
+                text: $imageStore.prompt
             )
         case .negativePrompt:
             PromptEditView(
                 title: Modal.negativePrompt.title,
-                text: $negativePrompt
+                text: $imageStore.negativePrompt
             )
         case .stepCount:
             NumberEntryView(
                 title: Modal.stepCount.title,
                 min: 1.0,
                 max: 50.0,
-                number: .fromInt($stepCount)
+                number: .fromInt($imageStore.stepCount)
             )
         case .guidanceScale:
             NumberEntryView(
@@ -284,7 +260,7 @@ private extension ImageGenerationView {
                 min: 1.0,
                 max: 20.0,
                 isDecimalShown: true,
-                number: $guidanceScale
+                number: $imageStore.guidanceScale
             )
         case .seed:
             NumberEntryView(
@@ -293,7 +269,7 @@ private extension ImageGenerationView {
                 max: Double(UInt32.max),
                 isSliderEnabled: false,
                 isKeyboardEnabled: true,
-                number: .fromInt($seed)
+                number: .fromInt($imageStore.seed)
             )
         }
     }

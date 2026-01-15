@@ -12,7 +12,14 @@ final class PreviewImageStore: GeneratedImageStoring {
 
     var state: GenerationState
 
-    var previewImage: UIImage
+    var prompt: String = ""
+    var negativePrompt: String = ""
+    var stepCount: Int = 25
+    var guidanceScale: Double = 11
+    var seed: Int = 0
+    var isSeedRandom: Bool = true
+
+    var previewImage: UIImage = .placeholder
 
     var currentStep: Int?
 
@@ -22,7 +29,6 @@ final class PreviewImageStore: GeneratedImageStoring {
 
     init(
         state: GenerationState = .idle,
-        previewImage: UIImage = .placeholder,
         currentStep: Int? = 3,
         storedImages: [GeneratedImage] = [
             .init(
@@ -62,7 +68,6 @@ final class PreviewImageStore: GeneratedImageStoring {
         isErrorShown: Bool = false
     ) {
         self.state = state
-        self.previewImage = previewImage
         self.currentStep = currentStep
         self.storedImages = storedImages
 
@@ -70,7 +75,9 @@ final class PreviewImageStore: GeneratedImageStoring {
         errorInfo = isErrorShown ? info : nil
     }
 
-    func generateImages(with params: GenerationParameters) {}
+    func generateImages() {}
 
     func cancelImageGeneration() {}
+
+    func update(previewImage: UIImage?, shouldResetState: Bool) {}
 }

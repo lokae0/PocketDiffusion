@@ -8,30 +8,6 @@
 import UIKit
 import SwiftUI
 
-protocol GeneratedImageStoring {
-
-    /// Current image generation status
-    var state: GenerationState { get }
-
-    /// Updates as previews are generated. Starts with a placeholder
-    var previewImage: UIImage { get set }
-
-    /// Current progress step while generating images
-    var currentStep: Int? { get }
-
-    /// Persisted image collection
-    var storedImages: [GeneratedImage] { get }
-
-    /// Content for an alert if an error occurs
-    var errorInfo: ErrorInfo? { get set }
-
-    /// Kicks off image generation and updates preview and result images when done
-    func generateImages(with params: GenerationParameters)
-
-    /// Cancels image generation process
-    func cancelImageGeneration()
-}
-
 enum GenerationState {
     /// Startup or cancelled state
     case idle
@@ -51,14 +27,81 @@ where Generator: Generating,
 {
     private(set) var state: GenerationState = .idle
 
-    var previewImage: UIImage = .placeholder
-    var currentStep: Int?
+    private(set) var previewImage: UIImage = .placeholder
+    private(set) var currentStep: Int?
 
     private(set) var storedImages: [GeneratedImage] = []
     var errorInfo: ErrorInfo?
 
     private let imageGenerator: Generator
     private let persistence: Persistence
+
+    var prompt: String {
+        get {
+            access(keyPath: \.prompt)
+            return UserDefaults.standard.string(forKey: "prompt") ?? ""
+        }
+        set {
+            withMutation(keyPath: \.prompt) {
+                UserDefaults.standard.setValue(newValue, forKey: "prompt")
+            }
+        }
+    }
+    var negativePrompt: String {
+        get {
+            access(keyPath: \.negativePrompt)
+            return UserDefaults.standard.string(forKey: "negativePrompt") ?? ""
+        }
+        set {
+            withMutation(keyPath: \.negativePrompt) {
+                UserDefaults.standard.setValue(newValue, forKey: "negativePrompt")
+            }
+        }
+    }
+    var stepCount: Int {
+        get {
+            access(keyPath: \.stepCount)
+            return UserDefaults.standard.object(forKey: "stepCount") as? Int ?? 25
+        }
+        set {
+            withMutation(keyPath: \.stepCount) {
+                UserDefaults.standard.setValue(newValue, forKey: "stepCount")
+            }
+        }
+    }
+    var guidanceScale: Double {
+        get {
+            access(keyPath: \.guidanceScale)
+            return UserDefaults.standard.object(forKey: "guidanceScale") as? Double ?? 11
+        }
+        set {
+            withMutation(keyPath: \.guidanceScale) {
+                UserDefaults.standard.setValue(newValue, forKey: "guidanceScale")
+            }
+        }
+    }
+    var seed: Int {
+        get {
+            access(keyPath: \.seed)
+            return UserDefaults.standard.object(forKey: "seed") as? Int ?? 0
+        }
+        set {
+            withMutation(keyPath: \.guidanceScale) {
+                UserDefaults.standard.setValue(newValue, forKey: "seed")
+            }
+        }
+    }
+    var isSeedRandom: Bool {
+        get {
+            access(keyPath: \.isSeedRandom)
+            return UserDefaults.standard.object(forKey: "isSeedRandom") as? Bool ?? true
+        }
+        set {
+            withMutation(keyPath: \.isSeedRandom) {
+                UserDefaults.standard.setValue(newValue, forKey: "isSeedRandom")
+            }
+        }
+    }
 
     private var generationTask: Task<Void, Never>?
 
@@ -74,11 +117,18 @@ where Generator: Generating,
         }
     }
 
-    func generateImages(with params: GenerationParameters) {
+    func generateImages() {
         state = .waiting
         previewImage = .placeholder
         Timer.shared.startTimer(type: .awaitingPipeline)
 
+        let params = GenerationParameters(
+            prompt: prompt,
+            negativePrompt: negativePrompt,
+            stepCount: stepCount,
+            guidanceScale: guidanceScale,
+            seed: isSeedRandom ? UInt32.random(in: 0..<UInt32.max) : UInt32(seed),
+        )
         generationTask = Task {
             do {
                 for await generated in try await imageGenerator.generate(with: params) {
@@ -129,7 +179,17 @@ where Generator: Generating,
         state = .idle
 
         Log.shared.info("Cancel requested...")
+    }
 
+    func update(previewImage: UIImage?, shouldResetState: Bool) {
+        if let previewImage {
+            self.previewImage = previewImage
+        } else {
+            self.previewImage = .placeholder
+        }
+        if shouldResetState {
+            state = .idle
+        }
     }
 
     private func save() async throws(PersistenceError) {
