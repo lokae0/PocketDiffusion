@@ -77,7 +77,6 @@ private extension PromptEditView {
             } label: {
                 Label("Save", systemImage: UI.Symbol.checkmark)
             }
-            .disabled(text.isEmpty)
         }
     }
 

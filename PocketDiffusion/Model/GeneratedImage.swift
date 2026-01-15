@@ -7,7 +7,7 @@
 
 import UIKit
 
-struct GeneratedImage: Identifiable, Sendable {
+struct GeneratedImage: Identifiable, Hashable, Sendable {
     private(set) var id: UUID = .init()
     let uiImage: UIImage
     let params: GenerationParameters

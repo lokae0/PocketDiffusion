@@ -26,36 +26,48 @@ struct ImageGalleryView: View {
     @Binding var imageStore: GeneratedImageStoring
 
     var body: some View {
-        let imagesWithIndex = imageStore.storedImages.enumerated()
+        NavigationStack {
+            let imagesWithIndex = imageStore.storedImages.enumerated()
 
-        List(imagesWithIndex, id: \.element.id) { index, storedImage in
-            HStack(alignment: .top, spacing: UI.Spacing.medium) {
-                ZStack {
-                    Image(uiImage: storedImage.uiImage)
-                        .resizable()
-                        .scaledToFit()
-                        .cornerRadius(UI.cornerRadius)
-
-                    numberIcon(for: index)
-                        .shadow(radius: UI.Number.shadowRadius)
-                        .frame(
-                            maxWidth: UI.numberFrameSize,
-                            maxHeight: UI.numberFrameSize,
-                            alignment: .topLeading
-                        )
+            List(imagesWithIndex, id: \.element.id) { index, storedImage in
+                NavigationLink(value: storedImage) {
+                    cell(for: storedImage, at: index)
+                        .frame(maxHeight: UI.cellHeight)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-
-                labels(for: storedImage)
-                    .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(maxHeight: UI.cellHeight)
-            .fixedSize(horizontal: false, vertical: true)
+            .listStyle(.plain)
+            .navigationDestination(for: GeneratedImage.self) { storedImage in
+                ImageDetailView(image: storedImage)
+            }
         }
-        .listStyle(.plain)
     }
 }
 
 private extension ImageGalleryView {
+
+    @ViewBuilder
+    private func cell(for storedImage: GeneratedImage, at index: Int) -> some View {
+        HStack(alignment: .top, spacing: UI.Spacing.medium) {
+            ZStack {
+                Image(uiImage: storedImage.uiImage)
+                    .resizable()
+                    .scaledToFit()
+                    .cornerRadius(UI.cornerRadius)
+
+                numberIcon(for: index)
+                    .shadow(radius: UI.Number.shadowRadius)
+                    .frame(
+                        maxWidth: UI.numberFrameSize,
+                        maxHeight: UI.numberFrameSize,
+                        alignment: .topLeading
+                    )
+            }
+
+            labels(for: storedImage)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
 
     @ViewBuilder
     private func labels(for storedImage: GeneratedImage) -> some View {

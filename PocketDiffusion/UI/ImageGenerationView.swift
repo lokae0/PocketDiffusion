@@ -147,7 +147,7 @@ private extension ImageGenerationView {
             imageStore.generateImages(
                 with: GenerationParameters(
                     prompt: prompt == .promptPlaceholder ? "" : prompt,
-                    negativePrompt: negativePrompt == .promptPlaceholder ? "" : prompt,
+                    negativePrompt: negativePrompt == .promptPlaceholder ? "" : negativePrompt,
                     stepCount: stepCount,
                     guidanceScale: guidanceScale,
                     seed: isSeedRandom ? UInt32.random(in: 0..<UInt32.max) : UInt32(seed),
