@@ -28,6 +28,11 @@ struct ImageDetailView: View {
 
     var image: GeneratedImage
 
+    // Used to navigate back to generation view
+    @Binding var selectedTab: ContentView.TabType
+
+    @State private var showCopyAlert: Bool = false
+
     private var params: GenerationParameters {
         image.params
     }
@@ -49,6 +54,9 @@ struct ImageDetailView: View {
                 numberLabels
             }
             .padding(UI.Spacing.medium)
+        }
+        .toolbar {
+            copyToolBarItem
         }
         .scrollIndicators(.hidden)
     }
@@ -79,9 +87,32 @@ private extension ImageDetailView {
                 .fontWeight(.medium)
         }
     }
+
+    @ToolbarContentBuilder
+    private var copyToolBarItem: some ToolbarContent {
+        ToolbarItem(placement: .primaryAction) {
+            Button {
+                showCopyAlert = true
+            } label: {
+                Label("Copy", systemImage: UI.Symbol.copy)
+            }
+            .alert("Copy these settings to the Generate tab?", isPresented: $showCopyAlert) {
+                Button(role: .confirm) {
+                    selectedTab = .imageGeneration
+                } label: {
+                    Text("Proceed")
+                }
+
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This will replace all current settings!")
+            }
+        }
+    }
 }
 
 #Preview {
+    @Previewable @State var selectedTab: ContentView.TabType = .imageGallery
     @Previewable var generatedImage: GeneratedImage = .init(
         uiImage: .image(color: .darkGray),
         params: .init(
@@ -93,5 +124,5 @@ private extension ImageDetailView {
         ),
         duration: 5.897
     )
-    ImageDetailView(image: generatedImage)
+    ImageDetailView(image: generatedImage, selectedTab: $selectedTab)
 }

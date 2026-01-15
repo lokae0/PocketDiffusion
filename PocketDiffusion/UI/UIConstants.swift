@@ -26,6 +26,7 @@ enum UI {
         static let xmark = "xmark"
         static let plus = "plus"
         static let minus = "minus"
+        static let copy = "document.on.document"
     }
 }
 

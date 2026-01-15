@@ -24,6 +24,7 @@ private extension UI {
 struct ImageGalleryView: View {
 
     @Binding var imageStore: GeneratedImageStoring
+    @Binding var selectedTab: ContentView.TabType
 
     var body: some View {
         NavigationStack {
@@ -37,8 +38,9 @@ struct ImageGalleryView: View {
                 }
             }
             .listStyle(.plain)
+            .navigationLinkIndicatorVisibility(.hidden)
             .navigationDestination(for: GeneratedImage.self) { storedImage in
-                ImageDetailView(image: storedImage)
+                ImageDetailView(image: storedImage, selectedTab: $selectedTab)
             }
         }
     }
@@ -98,6 +100,8 @@ private extension ImageGalleryView {
 }
 
 #Preview {
+    @Previewable @State var selectedTab: ContentView.TabType = .imageGallery
     @Previewable @State var previewImageStore: any GeneratedImageStoring = PreviewImageStore()
-    ImageGalleryView(imageStore: $previewImageStore)
+
+    ImageGalleryView(imageStore: $previewImageStore, selectedTab: $selectedTab)
 }

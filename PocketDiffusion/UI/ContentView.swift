@@ -28,10 +28,15 @@ struct ContentView: View {
         }
 
         @ViewBuilder
-        func view(with imageStore: Binding<GeneratedImageStoring>) -> some View {
+        func view(
+            with imageStore: Binding<GeneratedImageStoring>,
+            selectedTab: Binding<TabType>
+        ) -> some View {
             switch self {
-            case .imageGeneration: ImageGenerationView(imageStore: imageStore)
-            case .imageGallery: ImageGalleryView(imageStore: imageStore)
+            case .imageGeneration:
+                ImageGenerationView(imageStore: imageStore)
+            case .imageGallery:
+                ImageGalleryView(imageStore: imageStore, selectedTab: selectedTab)
             }
         }
 
@@ -49,7 +54,7 @@ struct ContentView: View {
                     systemImage: type.systemImage,
                     value: type
                 ) {
-                    type.view(with: $imageStore)
+                    type.view(with: $imageStore, selectedTab: $selectedTab)
                 }
             }
         }
