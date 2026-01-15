@@ -14,7 +14,7 @@ protocol Generating: Actor {
     associatedtype Generated: Sendable
 
     /// Loads models if required and begins generation when ready
-    func generate(with params: GenerationParameters) throws -> AsyncStream<Generated>
+    func generate(with settings: GenerationSettings) throws -> AsyncStream<Generated>
 }
 
 final actor ImageGenerator: Generating {
@@ -56,13 +56,13 @@ final actor ImageGenerator: Generating {
         }
     }
 
-    func generate(with params: GenerationParameters) throws -> AsyncStream<Generated> {
+    func generate(with settings: GenerationSettings) throws -> AsyncStream<Generated> {
         AsyncStream { continuation in
-            var config = StableDiffusionPipeline.Configuration(prompt: params.prompt)
-            config.negativePrompt = params.negativePrompt
-            config.stepCount = params.stepCount
-            config.guidanceScale = Float(params.guidanceScale)
-            config.seed = params.seed
+            var config = StableDiffusionPipeline.Configuration(prompt: settings.prompt)
+            config.negativePrompt = settings.negativePrompt
+            config.stepCount = settings.stepCount
+            config.guidanceScale = Float(settings.guidanceScale)
+            config.seed = settings.seed
             config.useDenoisedIntermediates = true
             config.schedulerType = .dpmSolverMultistepScheduler
 
@@ -77,7 +77,7 @@ final actor ImageGenerator: Generating {
                     return
                 }
                 Log.shared.currentThread(
-                    loggingPrefix + "Calling `pipeline.generateImages` with params: \(params)"
+                    loggingPrefix + "Calling `pipeline.generateImages` with settings: \(settings)"
                 )
                 await Timer.shared.startTimer(type: .imageGeneration)
                 let _ = try pipeline.generateImages(configuration: config) { progress in

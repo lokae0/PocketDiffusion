@@ -30,17 +30,27 @@ struct ImageGalleryView: View {
         NavigationStack {
             let imagesWithIndex = imageStore.storedImages.enumerated()
 
-            List(imagesWithIndex, id: \.element.id) { index, storedImage in
-                NavigationLink(value: storedImage) {
-                    cell(for: storedImage, at: index)
-                        .frame(maxHeight: UI.cellHeight)
-                        .fixedSize(horizontal: false, vertical: true)
+            if imagesWithIndex.isEmpty {
+                Text("Get to generating!!")
+                    .font(.system(.headline))
+                    .centeredInFrame()
+            } else {
+                List(imagesWithIndex, id: \.element.id) { index, storedImage in
+                    NavigationLink(value: storedImage) {
+                        cell(for: storedImage, at: index)
+                            .frame(maxHeight: UI.cellHeight)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
-            }
-            .listStyle(.plain)
-            .navigationLinkIndicatorVisibility(.hidden)
-            .navigationDestination(for: GeneratedImage.self) { storedImage in
-                ImageDetailView(image: storedImage, selectedTab: $selectedTab)
+                .listStyle(.plain)
+                .navigationLinkIndicatorVisibility(.hidden)
+                .navigationDestination(for: GeneratedImage.self) { storedImage in
+                    ImageDetailView(
+                        image: storedImage,
+                        imageStore: $imageStore,
+                        selectedTab: $selectedTab
+                    )
+                }
             }
         }
     }
@@ -74,11 +84,11 @@ private extension ImageGalleryView {
     @ViewBuilder
     private func labels(for storedImage: GeneratedImage) -> some View {
         VStack(alignment: .leading, spacing: UI.Spacing.small) {
-            Text(storedImage.params.prompt)
+            Text(storedImage.settings.prompt)
                 .minimumScaleFactor(UI.minScaleFactor)
             Spacer()
             HStack {
-                Text("Steps: \(storedImage.params.stepCount)")
+                Text("Steps: \(storedImage.settings.stepCount)")
                 Spacer()
                 Text(storedImage.durationString)
             }

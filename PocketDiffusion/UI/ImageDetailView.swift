@@ -28,13 +28,15 @@ struct ImageDetailView: View {
 
     var image: GeneratedImage
 
+    @Binding var imageStore: GeneratedImageStoring
+
     // Used to navigate back to generation view
     @Binding var selectedTab: ContentView.TabType
 
     @State private var showCopyAlert: Bool = false
 
-    private var params: GenerationParameters {
-        image.params
+    private var settings: GenerationSettings {
+        image.settings
     }
 
     var body: some View {
@@ -47,9 +49,9 @@ struct ImageDetailView: View {
                     .frame(maxWidth: UI.imageHeight, maxHeight: UI.imageHeight)
                     .centeredInFrame()
                 
-                promptLabels(title: "Prompt", content: params.prompt)
+                promptLabels(title: "Prompt", content: settings.prompt)
                 
-                promptLabels(title: "Negative prompt", content: params.negativePrompt)
+                promptLabels(title: "Negative prompt", content: settings.negativePrompt)
 
                 numberLabels
             }
@@ -59,6 +61,16 @@ struct ImageDetailView: View {
             copyToolBarItem
         }
         .scrollIndicators(.hidden)
+    }
+
+    private func replaceCurrentSettings() {
+        imageStore.prompt = settings.prompt
+        imageStore.negativePrompt = settings.negativePrompt
+        imageStore.guidanceScale = settings.guidanceScale
+        imageStore.stepCount = settings.stepCount
+        imageStore.seed = Int(settings.seed)
+
+        imageStore.update(previewImage: image.uiImage, shouldResetState: true)
     }
 }
 
@@ -76,12 +88,12 @@ private extension ImageDetailView {
     @ViewBuilder
     private var numberLabels: some View {
         VStack(alignment: .leading, spacing: UI.Spacing.small) {
-            Text("Steps: \(params.stepCount)")
+            Text("Steps: \(settings.stepCount)")
                 .fontWeight(.medium)
-            let guidanceFormat = String(format: "%.1f", arguments: [params.guidanceScale])
+            let guidanceFormat = String(format: "%.1f", arguments: [settings.guidanceScale])
             Text("Guidance scale: \(guidanceFormat)")
                 .fontWeight(.medium)
-            Text("Seed: \(params.seed)")
+            Text("Seed: \(Int(settings.seed))")
                 .fontWeight(.medium)
             Text("Generated in: \(image.durationString)")
                 .fontWeight(.medium)
@@ -98,6 +110,7 @@ private extension ImageDetailView {
             }
             .alert("Copy these settings to the Generate tab?", isPresented: $showCopyAlert) {
                 Button(role: .confirm) {
+                    replaceCurrentSettings()
                     selectedTab = .imageGeneration
                 } label: {
                     Text("Proceed")
@@ -113,9 +126,11 @@ private extension ImageDetailView {
 
 #Preview {
     @Previewable @State var selectedTab: ContentView.TabType = .imageGallery
+    @Previewable @State var previewImageStore: any GeneratedImageStoring = PreviewImageStore()
+
     @Previewable var generatedImage: GeneratedImage = .init(
         uiImage: .image(color: .darkGray),
-        params: .init(
+        settings: .init(
             prompt: String.samplePrompt,
             negativePrompt: String.sampleNegativePrompt,
             stepCount: 50,
@@ -124,5 +139,9 @@ private extension ImageDetailView {
         ),
         duration: 5.897
     )
-    ImageDetailView(image: generatedImage, selectedTab: $selectedTab)
+    ImageDetailView(
+        image: generatedImage,
+        imageStore: $previewImageStore,
+        selectedTab: $selectedTab
+    )
 }

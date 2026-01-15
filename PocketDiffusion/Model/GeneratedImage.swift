@@ -10,7 +10,7 @@ import UIKit
 struct GeneratedImage: Identifiable, Hashable, Sendable {
     private(set) var id: UUID = .init()
     let uiImage: UIImage
-    let params: GenerationParameters
+    let settings: GenerationSettings
     let duration: TimeInterval
 
     var durationString: String {
@@ -22,14 +22,14 @@ struct GeneratedImage: Identifiable, Hashable, Sendable {
 extension GeneratedImage: Codable {
 
     enum CodingKeys: String, CodingKey {
-        case id, uiImage, params, duration
+        case id, uiImage, settings, duration
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         self.id = try container.decode(UUID.self, forKey: .id)
-        self.params = try container.decode(GenerationParameters.self, forKey: .params)
+        self.settings = try container.decode(GenerationSettings.self, forKey: .settings)
         self.duration = try container.decode(TimeInterval.self, forKey: .duration)
 
         let imageData = try container.decode(Data.self, forKey: .uiImage)
@@ -47,7 +47,7 @@ extension GeneratedImage: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         try container.encode(id, forKey: .id)
-        try container.encode(params, forKey: .params)
+        try container.encode(settings, forKey: .settings)
         try container.encode(duration, forKey: .duration)
 
         guard let imageData = uiImage.pngData() else {

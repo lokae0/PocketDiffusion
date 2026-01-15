@@ -1,5 +1,5 @@
 //
-//  GenerationParameters.swift
+//  GenerationSettings.swift
 //  PocketDiffusion
 //
 //  Created by Ian Luo on 1/7/26.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct GenerationParameters: Sendable, Hashable, Codable {
+struct GenerationSettings: Sendable, Hashable, Codable {
 
     let prompt: String
     let negativePrompt: String

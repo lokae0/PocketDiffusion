@@ -44,7 +44,7 @@ protocol GeneratedImageStoring {
     /// Content for an alert if an error occurs
     var errorInfo: ErrorInfo? { get set }
 
-    /// Kicks off image generation using `currentParams`
+    /// Kicks off image generation using current settings
     /// and updates preview and result images when done
     func generateImages()
 

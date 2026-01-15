@@ -27,6 +27,73 @@ where Generator: Generating,
 {
     private(set) var state: GenerationState = .idle
 
+    var prompt: String {
+        get {
+            access(keyPath: \.prompt)
+            return userDefaults.string(forKey: "prompt") ?? ""
+        }
+        set {
+            withMutation(keyPath: \.prompt) {
+                userDefaults.setValue(newValue, forKey: "prompt")
+            }
+        }
+    }
+    var negativePrompt: String {
+        get {
+            access(keyPath: \.negativePrompt)
+            return userDefaults.string(forKey: "negativePrompt") ?? ""
+        }
+        set {
+            withMutation(keyPath: \.negativePrompt) {
+                userDefaults.setValue(newValue, forKey: "negativePrompt")
+            }
+        }
+    }
+    var stepCount: Int {
+        get {
+            access(keyPath: \.stepCount)
+            return userDefaults.object(forKey: "stepCount") as? Int ?? 25
+        }
+        set {
+            withMutation(keyPath: \.stepCount) {
+                userDefaults.setValue(newValue, forKey: "stepCount")
+            }
+        }
+    }
+    var guidanceScale: Double {
+        get {
+            access(keyPath: \.guidanceScale)
+            return userDefaults.object(forKey: "guidanceScale") as? Double ?? 11
+        }
+        set {
+            withMutation(keyPath: \.guidanceScale) {
+                userDefaults.setValue(newValue, forKey: "guidanceScale")
+            }
+        }
+    }
+    var seed: Int {
+        get {
+            access(keyPath: \.seed)
+            return userDefaults.object(forKey: "seed") as? Int ?? 0
+        }
+        set {
+            withMutation(keyPath: \.guidanceScale) {
+                userDefaults.setValue(newValue, forKey: "seed")
+            }
+        }
+    }
+    var isSeedRandom: Bool {
+        get {
+            access(keyPath: \.isSeedRandom)
+            return userDefaults.object(forKey: "isSeedRandom") as? Bool ?? true
+        }
+        set {
+            withMutation(keyPath: \.isSeedRandom) {
+                userDefaults.setValue(newValue, forKey: "isSeedRandom")
+            }
+        }
+    }
+
     private(set) var previewImage: UIImage = .placeholder
     private(set) var currentStep: Int?
 
@@ -36,74 +103,11 @@ where Generator: Generating,
     private let imageGenerator: Generator
     private let persistence: Persistence
 
-    var prompt: String {
-        get {
-            access(keyPath: \.prompt)
-            return UserDefaults.standard.string(forKey: "prompt") ?? ""
-        }
-        set {
-            withMutation(keyPath: \.prompt) {
-                UserDefaults.standard.setValue(newValue, forKey: "prompt")
-            }
-        }
-    }
-    var negativePrompt: String {
-        get {
-            access(keyPath: \.negativePrompt)
-            return UserDefaults.standard.string(forKey: "negativePrompt") ?? ""
-        }
-        set {
-            withMutation(keyPath: \.negativePrompt) {
-                UserDefaults.standard.setValue(newValue, forKey: "negativePrompt")
-            }
-        }
-    }
-    var stepCount: Int {
-        get {
-            access(keyPath: \.stepCount)
-            return UserDefaults.standard.object(forKey: "stepCount") as? Int ?? 25
-        }
-        set {
-            withMutation(keyPath: \.stepCount) {
-                UserDefaults.standard.setValue(newValue, forKey: "stepCount")
-            }
-        }
-    }
-    var guidanceScale: Double {
-        get {
-            access(keyPath: \.guidanceScale)
-            return UserDefaults.standard.object(forKey: "guidanceScale") as? Double ?? 11
-        }
-        set {
-            withMutation(keyPath: \.guidanceScale) {
-                UserDefaults.standard.setValue(newValue, forKey: "guidanceScale")
-            }
-        }
-    }
-    var seed: Int {
-        get {
-            access(keyPath: \.seed)
-            return UserDefaults.standard.object(forKey: "seed") as? Int ?? 0
-        }
-        set {
-            withMutation(keyPath: \.guidanceScale) {
-                UserDefaults.standard.setValue(newValue, forKey: "seed")
-            }
-        }
-    }
-    var isSeedRandom: Bool {
-        get {
-            access(keyPath: \.isSeedRandom)
-            return UserDefaults.standard.object(forKey: "isSeedRandom") as? Bool ?? true
-        }
-        set {
-            withMutation(keyPath: \.isSeedRandom) {
-                UserDefaults.standard.setValue(newValue, forKey: "isSeedRandom")
-            }
-        }
-    }
-
     private var generationTask: Task<Void, Never>?
+
+    private var userDefaults: UserDefaults {
+        UserDefaults.standard
+    }
 
     init(
         imageGenerator: Generator = ImageGenerator(),
@@ -122,7 +126,7 @@ where Generator: Generating,
         previewImage = .placeholder
         Timer.shared.startTimer(type: .awaitingPipeline)
 
-        let params = GenerationParameters(
+        let settings = GenerationSettings(
             prompt: prompt,
             negativePrompt: negativePrompt,
             stepCount: stepCount,
@@ -131,7 +135,7 @@ where Generator: Generating,
         )
         generationTask = Task {
             do {
-                for await generated in try await imageGenerator.generate(with: params) {
+                for await generated in try await imageGenerator.generate(with: settings) {
                     guard let result = generated as? (image: UIImage, step: Int) else {
                         Log.shared.info("Unexpected generation type!!")
                         continue
@@ -164,7 +168,7 @@ where Generator: Generating,
             storedImages.append(
                 GeneratedImage(
                     uiImage: previewImage,
-                    params: params,
+                    settings: settings,
                     duration: duration
                 )
             )

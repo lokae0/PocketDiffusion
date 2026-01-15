@@ -33,7 +33,7 @@ final class PreviewImageStore: GeneratedImageStoring {
         storedImages: [GeneratedImage] = [
             .init(
                 uiImage: .image(color: .darkGray),
-                params: .init(
+                settings: .init(
                     prompt: String.samplePrompt,
                     negativePrompt: "",
                     stepCount: 25,
@@ -44,7 +44,7 @@ final class PreviewImageStore: GeneratedImageStoring {
             ),
             .init(
                 uiImage: .image(color: .lightGray),
-                params: .init(
+                settings: .init(
                     prompt: "a giant cat on the moon",
                     negativePrompt: "weird eyes, no hands, big feet",
                     stepCount: 8,
@@ -55,7 +55,7 @@ final class PreviewImageStore: GeneratedImageStoring {
             ),
             .init(
                 uiImage: .image(color: .gray),
-                params: .init(
+                settings: .init(
                     prompt: "a giant cat on the moon with bizarre eyes and small hands",
                     negativePrompt: String.sampleNegativePrompt,
                     stepCount: 8,
