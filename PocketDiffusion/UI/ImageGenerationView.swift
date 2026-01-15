@@ -106,15 +106,7 @@ struct ImageGenerationView: View {
                     alignment: .bottom
                 )
         }
-        .alert(
-            imageStore.errorInfo?.title ?? "Oh no",
-            isPresented: .isPresent($imageStore.errorInfo),
-            presenting: imageStore.errorInfo
-        ) { _ in
-            // Default 'OK' button is included
-        } message: { info in
-            Text(info.message)
-        }
+        .errorInfoAlert(for: $imageStore)
     }
 }
 

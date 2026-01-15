@@ -56,4 +56,10 @@ protocol GeneratedImageStoring {
     ///   - previewImage: The new image to display. Nil will show the placeholder
     ///   - shouldResetState: Sets the state back to `idle` when true
     func update(previewImage: UIImage?, shouldResetState: Bool)
+
+    /// Delete images and save
+    func deleteImages(at offsets: IndexSet)
+
+    /// Move images and save
+    func moveImages(from source: IndexSet, to destination: Int)
 }

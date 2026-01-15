@@ -196,6 +196,20 @@ where Generator: Generating,
         }
     }
 
+    func deleteImages(at offsets: IndexSet) {
+        storedImages.remove(atOffsets: offsets)
+        Task {
+            await tryPersistence(save)
+        }
+    }
+
+    func moveImages(from source: IndexSet, to destination: Int) {
+        storedImages.move(fromOffsets: source, toOffset: destination)
+        Task {
+            await tryPersistence(save)
+        }
+    }
+
     private func save() async throws(PersistenceError) {
         try await persistence.save(model: storedImages)
     }

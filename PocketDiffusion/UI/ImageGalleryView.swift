@@ -35,14 +35,19 @@ struct ImageGalleryView: View {
                     .font(.system(.headline))
                     .centeredInFrame()
             } else {
-                List(imagesWithIndex, id: \.element.id) { index, storedImage in
-                    NavigationLink(value: storedImage) {
-                        cell(for: storedImage, at: index)
-                            .frame(maxHeight: UI.cellHeight)
-                            .fixedSize(horizontal: false, vertical: true)
+                List {
+                    ForEach(imagesWithIndex, id: \.element.id) {  index, storedImage in
+                        NavigationLink(value: storedImage) {
+                            cell(for: storedImage, at: index)
+                                .frame(maxHeight: UI.cellHeight)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                     }
+                    .onMove(perform: moveImages)
+                    .onDelete(perform: deleteImages)
                 }
                 .listStyle(.plain)
+                .toolbar { EditButton() }
                 .navigationLinkIndicatorVisibility(.hidden)
                 .navigationDestination(for: GeneratedImage.self) { storedImage in
                     ImageDetailView(
@@ -53,6 +58,15 @@ struct ImageGalleryView: View {
                 }
             }
         }
+        .errorInfoAlert(for: $imageStore)
+    }
+
+    func moveImages(from source: IndexSet, to destination: Int) {
+        imageStore.moveImages(from: source, to: destination)
+    }
+
+    private func deleteImages(at offsets: IndexSet) {
+        imageStore.deleteImages(at: offsets)
     }
 }
 
@@ -111,7 +125,8 @@ private extension ImageGalleryView {
 
 #Preview {
     @Previewable @State var selectedTab: ContentView.TabType = .imageGallery
-    @Previewable @State var previewImageStore: any GeneratedImageStoring = PreviewImageStore()
-
+    @Previewable @State var previewImageStore: any GeneratedImageStoring = PreviewImageStore(
+        isErrorShown: false
+    )
     ImageGalleryView(imageStore: $previewImageStore, selectedTab: $selectedTab)
 }

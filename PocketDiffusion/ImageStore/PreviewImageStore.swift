@@ -80,4 +80,8 @@ final class PreviewImageStore: GeneratedImageStoring {
     func cancelImageGeneration() {}
 
     func update(previewImage: UIImage?, shouldResetState: Bool) {}
+
+    func deleteImages(at offsets: IndexSet) {}
+
+    func moveImages(from source: IndexSet, to destination: Int) {}
 }

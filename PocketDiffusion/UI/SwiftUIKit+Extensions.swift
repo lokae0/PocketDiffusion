@@ -38,6 +38,18 @@ extension View {
             alignment: .center
         )
     }
+
+    func errorInfoAlert(for imageStore: Binding<GeneratedImageStoring>) -> some View {
+        alert(
+            imageStore.wrappedValue.errorInfo?.title ?? "Oh no",
+            isPresented: .isPresent(imageStore.errorInfo),
+            presenting: imageStore.wrappedValue.errorInfo
+        ) { _ in
+            // Default 'OK' button is included
+        } message: { info in
+            Text(info.message)
+        }
+    }
 }
 
 extension Binding {
