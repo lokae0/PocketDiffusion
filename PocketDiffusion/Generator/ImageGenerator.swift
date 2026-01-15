@@ -19,7 +19,7 @@ protocol Generating: Actor {
 
 final actor ImageGenerator: Generating {
 
-    typealias Generated = UIImage
+    typealias Generated = (image: UIImage, step: Int)
 
     private let pipeline: StableDiffusionPipeline
 
@@ -90,7 +90,8 @@ final actor ImageGenerator: Generating {
                     // Return stream of images as they're generated
                     if let currentImage = progress.currentImages.compactMap({ $0 }).last {
                         Log.shared.info(loggingPrefix + "Step: \(progress.step)")
-                        continuation.yield(UIImage(cgImage: currentImage))
+                        let image = UIImage(cgImage: currentImage)
+                        continuation.yield((image, progress.step))
                     }
                     // Check if we're done
                     if progress.step == progress.stepCount - 1 {

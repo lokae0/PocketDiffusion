@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 protocol GeneratedImageStoring {
 
@@ -14,6 +15,9 @@ protocol GeneratedImageStoring {
 
     /// Updates as previews are generated. Starts with a placeholder
     var previewImage: UIImage { get set }
+
+    /// Current progress step while generating images
+    var currentStep: Int? { get }
 
     /// Persisted image collection
     var storedImages: [GeneratedImage] { get }
@@ -48,6 +52,8 @@ where Generator: Generating,
     private(set) var state: GenerationState = .idle
 
     var previewImage: UIImage = .placeholder
+    var currentStep: Int?
+
     private(set) var storedImages: [GeneratedImage] = []
     var errorInfo: ErrorInfo?
 
@@ -76,8 +82,8 @@ where Generator: Generating,
         generationTask = Task {
             do {
                 for await generated in try await imageGenerator.generate(with: params) {
-                    guard let uiImage = generated as? UIImage else {
-                        Log.shared.info("Unexpected type for generated image!!")
+                    guard let result = generated as? (image: UIImage, step: Int) else {
+                        Log.shared.info("Unexpected generation type!!")
                         continue
                     }
                     Log.shared.currentThread(
@@ -85,7 +91,8 @@ where Generator: Generating,
                         isEnabled: false
                     )
                     state = .receiving
-                    previewImage = uiImage
+                    previewImage = result.image
+                    currentStep = result.step
                 }
             } catch {
                 errorInfo = ErrorInfo(
@@ -101,6 +108,7 @@ where Generator: Generating,
             }
             let duration = Timer.shared.stopTimer(type: .imageGeneration)
             state = .done
+            currentStep = nil
 
             // Last preview image is the final result
             storedImages.append(
@@ -117,6 +125,7 @@ where Generator: Generating,
     func cancelImageGeneration() {
         generationTask?.cancel()
         previewImage = .placeholder
+        currentStep = nil
         state = .idle
 
         Log.shared.info("Cancel requested...")

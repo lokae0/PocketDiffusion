@@ -22,6 +22,10 @@ private extension UI {
             )
         }
     }
+    enum CurrentStep {
+        static let horizontalPadding: CGFloat = -20.0
+        static let verticalPadding: CGFloat = -5.0
+    }
 }
 
 struct ImageGenerationView: View {
@@ -201,9 +205,26 @@ private extension ImageGenerationView {
                     .progressViewStyle(CircularProgressViewStyle())
                     .centeredInFrame()
             }
-            if imageStore.state == .done {
-                let frameSize = UI.DoneIndicator.frameSize(parentSize: previewImageSize)
 
+            let frameSize = UI.DoneIndicator.frameSize(parentSize: previewImageSize)
+            if imageStore.state == .receiving, let currentStep = imageStore.currentStep {
+                Text("Steps completed: \(currentStep + 1) of \(stepCount)")
+                    .font(.system(.footnote))
+                    .background(
+                        Rectangle()
+                            .fill(.ultraThinMaterial)
+                            .cornerRadius(UI.cornerRadius)
+                            .padding(.horizontal, UI.CurrentStep.horizontalPadding)
+                            .padding(.vertical, UI.CurrentStep.verticalPadding)
+                    )
+                    .frame(
+                        width: frameSize.width,
+                        height: frameSize.height,
+                        alignment: .top
+                    )
+            }
+
+            if imageStore.state == .done {
                 VStack(alignment: .trailing) {
                     Image(systemName: UI.Symbol.checkmarkCircleFill)
                         .font(.system(size: UI.DoneIndicator.size))

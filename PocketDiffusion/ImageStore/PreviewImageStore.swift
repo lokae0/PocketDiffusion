@@ -14,6 +14,8 @@ final class PreviewImageStore: GeneratedImageStoring {
 
     var previewImage: UIImage
 
+    var currentStep: Int?
+
     var storedImages: [GeneratedImage]
 
     var errorInfo: ErrorInfo?
@@ -21,6 +23,7 @@ final class PreviewImageStore: GeneratedImageStoring {
     init(
         state: GenerationState = .idle,
         previewImage: UIImage = .placeholder,
+        currentStep: Int? = 3,
         storedImages: [GeneratedImage] = [
             .init(
                 uiImage: .image(color: .darkGray),
@@ -60,6 +63,7 @@ final class PreviewImageStore: GeneratedImageStoring {
     ) {
         self.state = state
         self.previewImage = previewImage
+        self.currentStep = currentStep
         self.storedImages = storedImages
 
         let info = ErrorInfo(title: "Ah crap", message: "Something blew up")
