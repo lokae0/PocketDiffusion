@@ -39,6 +39,7 @@ struct ImageGenerationView: View {
     @State private var previewImageSize: CGSize = .zero
     @State private var shownModal: Modal?
     @State private var isCancelAlertShown: Bool = false
+    @State private var isZoomableImageShown: Bool = false
 
     private enum Modal: String, Identifiable {
         case prompt
@@ -97,6 +98,9 @@ struct ImageGenerationView: View {
                 item: $shownModal,
                 content: content(for:)
             )
+            .fullScreenCover(isPresented: $isZoomableImageShown) {
+                ModalZoomableImageView(uiImage: imageStore.previewImage)
+            }
 
             primaryAction
                 .padding(.bottom, UI.Spacing.large)
@@ -156,6 +160,9 @@ private extension ImageGenerationView {
                     return proxy.size
                 } action: { newSize in
                     previewImageSize = newSize
+                }
+                .onTapGesture {
+                    isZoomableImageShown = true
                 }
 
             let loadingMessage = [

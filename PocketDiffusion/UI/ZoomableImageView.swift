@@ -26,45 +26,49 @@ struct ZoomableImageView: View {
     @State private var imageSize: CGSize = .zero
 
     var body: some View {
-        Image(uiImage: uiImage)
-            .resizable()
-            .scaledToFit()
-            .scaleEffect(currentScale)
-            .offset(currentOffset)
-            .onGeometryChange(for: CGSize.self) { proxy in
-                return proxy.size
-            } action: { newSize in
-                imageSize = newSize
-            }
-            .gesture(
-                MagnifyGesture()
-                    .onChanged { value in
-                        currentScale = finalScale * value.magnification
-                    }
-                    .onEnded { _ in
+        VStack(alignment: .center) {
+            Image(uiImage: uiImage)
+                .resizable()
+                .scaledToFit()
+                .scaleEffect(currentScale)
+                .offset(currentOffset)
+                .onGeometryChange(for: CGSize.self) { proxy in
+                    return proxy.size
+                } action: { newSize in
+                    imageSize = newSize
+                }
+                .gesture(
+                    MagnifyGesture()
+                        .onChanged { value in
+                            currentScale = finalScale * value.magnification
+                        }
+                        .onEnded { _ in
+                            fixBounds()
+                        }
+                        .simultaneously(
+                            with: DragGesture()
+                                .onChanged { value in
+                                    currentOffset = CGSize(
+                                        width: finalOffset.width + value.translation.width,
+                                        height: finalOffset.height + value.translation.height
+                                    )
+                                }
+                                .onEnded { _ in
+                                    fixBounds()
+                                }
+                        )
+                )
+                .onTapGesture(count: 2) {
+                    // Double tap to zoom or unzoom
+                    withAnimation(.easeInOut(duration: UI.animationDuration)) {
+                        let hasNotZoomed = currentScale == 1.0
+                        currentScale = hasNotZoomed ? 2.0 : 1.0
                         fixBounds()
                     }
-                    .simultaneously(
-                        with: DragGesture()
-                            .onChanged { value in
-                                currentOffset = CGSize(
-                                    width: finalOffset.width + value.translation.width,
-                                    height: finalOffset.height + value.translation.height
-                                )
-                            }
-                            .onEnded { _ in
-                                fixBounds()
-                            }
-                    )
-            )
-            .onTapGesture(count: 2) {
-                // Double tap to zoom or unzoom
-                withAnimation(.easeInOut(duration: UI.animationDuration)) {
-                    let hasNotZoomed = currentScale == 1.0
-                    currentScale = hasNotZoomed ? 2.0 : 1.0
-                    fixBounds()
                 }
-            }
+
+            Spacer()
+        }
     }
 
     private func fixBounds() {
@@ -95,7 +99,37 @@ struct ZoomableImageView: View {
     }
 }
 
+struct ModalZoomableImageView: View {
+
+    var uiImage: UIImage
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ZoomableImageView(uiImage: uiImage)
+                .toolbar {
+                    dismissToolbarItem
+                }
+        }
+    }
+}
+
+private extension ModalZoomableImageView {
+
+    @ToolbarContentBuilder
+    var dismissToolbarItem: some ToolbarContent {
+        ToolbarItem(placement: .cancellationAction) {
+            Button {
+                dismiss()
+            } label: {
+                Label("Dismiss", systemImage: UI.Symbol.xmark)
+            }
+        }
+    }
+}
+
 #Preview {
     @Previewable var uiImage: UIImage = .image(color: .systemGreen)
-    ZoomableImageView(uiImage: uiImage)
+    ModalZoomableImageView(uiImage: uiImage)
 }
