@@ -34,6 +34,7 @@ struct ImageDetailView: View {
     @Binding var selectedTab: ContentView.TabType
 
     @State private var showCopyAlert: Bool = false
+    @State private var showShareSheet: Bool = false
 
     private var settings: GenerationSettings {
         image.settings
@@ -59,6 +60,7 @@ struct ImageDetailView: View {
         }
         .toolbar {
             copyToolBarItem
+            shareToolBarItem
         }
         .scrollIndicators(.hidden)
     }
@@ -119,6 +121,20 @@ private extension ImageDetailView {
                 Button("Cancel", role: .cancel) {}
             } message: {
                 Text("This will replace all current settings!")
+            }
+        }
+    }
+
+    @ToolbarContentBuilder
+    private var shareToolBarItem: some ToolbarContent {
+        ToolbarItem(placement: .confirmationAction) {
+            Button {
+                showShareSheet = true
+            } label: {
+                Label("Share", systemImage: UI.Symbol.share)
+            }
+            .sheet(isPresented: $showShareSheet) {
+                ShareSheetViewController(activityItems: [image.uiImage])
             }
         }
     }

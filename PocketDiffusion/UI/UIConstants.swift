@@ -20,13 +20,16 @@ enum UI {
     }
 
     enum Symbol {
+        static let generate = "wand.and.sparkles"
+        static let gallery = "photo.on.rectangle"
         static let checkmark = "checkmark"
         static let checkmarkCircleFill = "checkmark.circle.fill"
         static let eraser = "eraser"
         static let xmark = "xmark"
         static let plus = "plus"
         static let minus = "minus"
-        static let copy = "document.on.document"
+        static let copy = "wand.and.sparkles.inverse"
+        static let share = "square.and.arrow.up"
     }
 }
 

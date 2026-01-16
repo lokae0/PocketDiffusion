@@ -22,8 +22,8 @@ struct ContentView: View {
 
         var systemImage: String {
             switch self {
-            case .imageGeneration: "wand.and.sparkles"
-            case .imageGallery: "photo.on.rectangle"
+            case .imageGeneration: UI.Symbol.generate
+            case .imageGallery: UI.Symbol.gallery
             }
         }
 
