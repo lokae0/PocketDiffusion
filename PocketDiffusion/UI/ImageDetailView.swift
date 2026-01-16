@@ -113,7 +113,7 @@ private extension ImageDetailView {
                 Label("Copy", systemImage: UI.Symbol.copy)
             }
             .alert("Copy these settings to the Generate tab?", isPresented: $showCopyAlert) {
-                Button(role: .confirm) {
+                Button(role: .destructive) {
                     replaceCurrentSettings()
                     selectedTab = .imageGeneration
                 } label: {
