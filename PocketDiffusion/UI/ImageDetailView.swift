@@ -43,13 +43,15 @@ struct ImageDetailView: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: UI.Spacing.large) {
-                Image(uiImage: image.uiImage)
-                    .resizable()
-                    .scaledToFit()
-                    .cornerRadius(UI.cornerRadius)
-                    .frame(maxWidth: UI.imageHeight, maxHeight: UI.imageHeight)
-                    .centeredInFrame()
-                
+                NavigationLink(destination: ZoomableImageView(uiImage: image.uiImage)) {
+                    Image(uiImage: image.uiImage)
+                        .resizable()
+                        .scaledToFit()
+                        .cornerRadius(UI.cornerRadius)
+                        .frame(maxWidth: UI.imageHeight, maxHeight: UI.imageHeight)
+                        .centeredInFrame()
+                }
+
                 promptLabels(title: "Prompt", content: settings.prompt)
                 
                 promptLabels(title: "Negative prompt", content: settings.negativePrompt)
