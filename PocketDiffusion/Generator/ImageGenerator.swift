@@ -28,7 +28,10 @@ final actor ImageGenerator: Generating {
     init() {
         let fatalLoadMessage = loggingPrefix + "Unable to load Stable Diffusion model resources"
 
-        guard let modelUrl = Bundle.main.url(forResource: "StableDiffusionModel", withExtension: nil) else {
+        guard let modelUrl = Bundle.main.url(
+            forResource: "coreml-stable-diffusion-v1-5-palettized_split_einsum_v2_compiled",
+            withExtension: nil
+        ) else {
             Log.shared.fatal(fatalLoadMessage)
         }
         do {

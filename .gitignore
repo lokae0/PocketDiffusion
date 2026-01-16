@@ -2,7 +2,7 @@
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
 
-StableDiffusionModel/
+coreml-stable-diffusion-v1-5-palettized_split_einsum_v2_compiled/
 
 ## User settings
 xcuserdata/

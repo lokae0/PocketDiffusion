@@ -37,7 +37,7 @@
 		3ED3E7832ED66A190056FC4A /* PocketDiffusion */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			explicitFolders = (
-				Resources/StableDiffusionModel,
+				"Resources/coreml-stable-diffusion-v1-5-palettized_split_einsum_v2_compiled",
 			);
 			path = PocketDiffusion;
 			sourceTree = "<group>";
