@@ -206,13 +206,13 @@ private extension ImageGenerationView {
                         .foregroundStyle(UI.tintColor)
                         .background(.white)
                         .cornerRadius(UI.DoneIndicator.size)
-                        .transition(.symbolEffect)
 
                     if let duration = imageStore.storedImages.last?.durationString {
                         Text(duration)
                             .padding(.top, UI.Spacing.extraSmall)
                     }
                 }
+                .transition(.symbolEffect)
                 .shadow(radius: UI.DoneIndicator.shadowRadius)
                 .frame(
                     width: frameSize.width,
