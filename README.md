@@ -1,9 +1,5 @@
 <img width="128" height="128" alt="" src="https://github.com/user-attachments/assets/7915bd13-539f-4d4f-bc0e-2f3f0a855dbf">
 <img width="128" height="128" alt="" src="https://github.com/user-attachments/assets/76dd4974-d894-4c4b-9e20-535f0829b56c">
-<img width="128" height="128" alt="" src="https://github.com/user-attachments/assets/7915bd13-539f-4d4f-bc0e-2f3f0a855dbf">
-<img width="128" height="128" alt="" src="https://github.com/user-attachments/assets/76dd4974-d894-4c4b-9e20-535f0829b56c">
-<img width="128" height="128" alt="" src="https://github.com/user-attachments/assets/7915bd13-539f-4d4f-bc0e-2f3f0a855dbf">
-<img width="128" height="128" alt="" src="https://github.com/user-attachments/assets/76dd4974-d894-4c4b-9e20-535f0829b56c">
 <p>
 
 # Pocket Diffusion
