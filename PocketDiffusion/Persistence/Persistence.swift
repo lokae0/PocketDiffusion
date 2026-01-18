@@ -16,6 +16,14 @@ protocol Persisting: Actor {
     func restore() throws(PersistenceError) -> Model
 }
 
+private extension String {
+    nonisolated static let saveErrorTitle = String(localized: "Failed to save image")
+    nonisolated static let saveErrorMessage = String(localized: "Please try generating again")
+
+    nonisolated static let restoreErrorTitle = String(localized: "Failed to restore images")
+    nonisolated static let restoreErrorMessage = String(localized: "Please restart the app")
+}
+
 enum PersistenceError: Error {
     case save, restore
 
@@ -23,13 +31,13 @@ enum PersistenceError: Error {
         switch self {
             case .save:
             return .init(
-                title: "Failed to save image",
-                message: "Please try generating again"
+                title: String.saveErrorTitle,
+                message: String.saveErrorMessage
             )
         case .restore:
             return .init(
-                title: "Failed to restore images",
-                message: "Please restart the app"
+                title: String.restoreErrorTitle,
+                message: String.restoreErrorMessage
             )
         }
     }

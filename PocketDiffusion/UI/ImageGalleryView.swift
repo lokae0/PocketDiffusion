@@ -21,6 +21,10 @@ private extension UI {
     }
 }
 
+private extension String {
+    static let emptyMessage = String(localized: "Get to generating!!")
+}
+
 struct ImageGalleryView: View {
 
     @Binding var imageStore: GeneratedImageStoring
@@ -31,7 +35,7 @@ struct ImageGalleryView: View {
             let imagesWithIndex = imageStore.storedImages.enumerated()
 
             if imagesWithIndex.isEmpty {
-                Text("Get to generating!!")
+                Text(String.emptyMessage)
                     .font(.system(.headline))
                     .centeredInFrame()
             } else {
@@ -102,7 +106,10 @@ private extension ImageGalleryView {
                 .minimumScaleFactor(UI.minScaleFactor)
             Spacer()
             HStack {
-                Text("Steps: \(storedImage.settings.stepCount)")
+                let stepCountLabel = String.Settings.displayLabel(
+                    stepCount: storedImage.settings.stepCount
+                )
+                Text(stepCountLabel)
                 Spacer()
                 Text(storedImage.durationString)
             }

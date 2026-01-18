@@ -24,6 +24,11 @@ private extension UI {
     }
 }
 
+private extension String {
+    static let copyAlertTitle = String(localized: "Copy these settings to the Generate tab?")
+    static let copyAlertMessage = String(localized: "This will replace all current settings!")
+}
+
 struct ImageDetailView: View {
 
     var image: GeneratedImage
@@ -52,9 +57,9 @@ struct ImageDetailView: View {
                         .centeredInFrame()
                 }
 
-                promptLabels(title: "Prompt", content: settings.prompt)
-                
-                promptLabels(title: "Negative prompt", content: settings.negativePrompt)
+                promptLabels(title: String.Settings.prompt, content: settings.prompt)
+
+                promptLabels(title: String.Settings.negativePrompt, content: settings.negativePrompt)
 
                 numberLabels
             }
@@ -92,14 +97,13 @@ private extension ImageDetailView {
     @ViewBuilder
     private var numberLabels: some View {
         VStack(alignment: .leading, spacing: UI.Spacing.small) {
-            Text("Steps: \(settings.stepCount)")
+            Text(String.Settings.displayLabel(stepCount: settings.stepCount))
                 .fontWeight(.medium)
-            let guidanceFormat = String(format: "%.1f", arguments: [settings.guidanceScale])
-            Text("Guidance scale: \(guidanceFormat)")
+            Text(String.Settings.displayLabel(guidance: settings.guidanceScale))
                 .fontWeight(.medium)
-            Text("Seed: \(Int(settings.seed))")
+            Text(String.Settings.displayLabel(seed: settings.seed))
                 .fontWeight(.medium)
-            Text("Generated in: \(image.durationString)")
+            Text(String.Settings.displayLabel(duration: image.durationString))
                 .fontWeight(.medium)
         }
     }
@@ -110,19 +114,19 @@ private extension ImageDetailView {
             Button {
                 showCopyAlert = true
             } label: {
-                Label("Copy", systemImage: UI.Symbol.copy)
+                Label(String.Button.copy, systemImage: UI.Symbol.copy)
             }
-            .alert("Copy these settings to the Generate tab?", isPresented: $showCopyAlert) {
+            .alert(String.copyAlertTitle, isPresented: $showCopyAlert) {
                 Button(role: .destructive) {
                     replaceCurrentSettings()
                     selectedTab = .imageGeneration
                 } label: {
-                    Text("Proceed")
+                    Text(String.Button.proceed)
                 }
 
-                Button("Cancel", role: .cancel) {}
+                Button(String.Button.cancel, role: .cancel) {}
             } message: {
-                Text("This will replace all current settings!")
+                Text(String.copyAlertMessage)
             }
         }
     }
@@ -133,7 +137,7 @@ private extension ImageDetailView {
             Button {
                 showShareSheet = true
             } label: {
-                Label("Share", systemImage: UI.Symbol.share)
+                Label(String.Button.share, systemImage: UI.Symbol.share)
             }
             .sheet(isPresented: $showShareSheet) {
                 ShareSheetViewController(activityItems: [image.uiImage])
@@ -149,8 +153,8 @@ private extension ImageDetailView {
     @Previewable var generatedImage: GeneratedImage = .init(
         uiImage: .image(color: .darkGray),
         settings: .init(
-            prompt: String.samplePrompt,
-            negativePrompt: String.sampleNegativePrompt,
+            prompt: String.Mock.samplePrompt,
+            negativePrompt: String.Mock.sampleNegativePrompt,
             stepCount: 50,
             guidanceScale: 15.0,
             seed: UInt32.max

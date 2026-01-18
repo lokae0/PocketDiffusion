@@ -41,7 +41,7 @@ extension View {
 
     func errorInfoAlert(for imageStore: Binding<GeneratedImageStoring>) -> some View {
         alert(
-            imageStore.wrappedValue.errorInfo?.title ?? "Oh no",
+            imageStore.wrappedValue.errorInfo?.title ?? String.fallbackErrorTitle,
             isPresented: .isPresent(imageStore.errorInfo),
             presenting: imageStore.wrappedValue.errorInfo
         ) { _ in

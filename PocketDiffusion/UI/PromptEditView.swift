@@ -40,6 +40,10 @@ struct PromptEditView: View {
     }
 }
 
+private extension String {
+    static let eraseAlertTitle = String(localized: "Erase all content?")
+}
+
 private extension PromptEditView {
 
     @ToolbarContentBuilder
@@ -52,16 +56,16 @@ private extension PromptEditView {
                     dismiss()
                 }
             } label: {
-                Label("Cancel", systemImage: UI.Symbol.xmark)
+                Label(String.Button.cancel, systemImage: UI.Symbol.xmark)
             }
-            .alert("Discard changes?", isPresented: $showCancelAlert) {
+            .alert(String.cancelAlertTitle, isPresented: $showCancelAlert) {
                 Button(role: .destructive) {
                     text = originalText
                     dismiss()
                 } label: {
-                    Text("Discard")
+                    Text(String.Button.discard)
                 }
-                Button("Cancel", role: .cancel) {}
+                Button(String.Button.cancel, role: .cancel) {}
             }
         }
     }
@@ -72,7 +76,7 @@ private extension PromptEditView {
             Button {
                 dismiss()
             } label: {
-                Label("Save", systemImage: UI.Symbol.checkmark)
+                Label(String.Button.save, systemImage: UI.Symbol.checkmark)
             }
         }
     }
@@ -83,23 +87,23 @@ private extension PromptEditView {
             Button {
                 showEraseAlert = true
             } label: {
-                Label("Erase", systemImage: UI.Symbol.eraser)
+                Label(String.Button.erase, systemImage: UI.Symbol.eraser)
             }
             .disabled(text.isEmpty)
-            .alert("Erase all content?", isPresented: $showEraseAlert) {
+            .alert(String.eraseAlertTitle, isPresented: $showEraseAlert) {
                 Button(role: .destructive) {
                     text = ""
                 } label: {
-                    Text("Erase")
+                    Text(String.Button.erase)
                 }
-                Button("Cancel", role: .cancel) {}
+                Button(String.Button.cancel, role: .cancel) {}
             }
         }
     }
 }
 
 #Preview {
-    @Previewable @State var text: String = .samplePrompt
+    @Previewable @State var text: String = .Mock.samplePrompt
 
     PromptEditView(title: "Prompt", text: $text)
 }

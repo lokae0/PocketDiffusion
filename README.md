@@ -28,6 +28,7 @@ This is a sample project that uses Stable Diffusion 1.5 to generate AI images lo
 * Basic persistence with `FileManager` and `UserDefaults`
   * Alternatives like [GRDB](https://github.com/groue/GRDB.swift), [sqlite-data](https://github.com/pointfreeco/sqlite-data), and SwiftData were considered but deemed overkill for the scope of this app  
 * SwiftUI with Apple's Liquid Glass design
+* String Catalogs (xcstrings) for localization
 * Swift Testing
 * Icon Composer
 

@@ -19,6 +19,11 @@ enum GenerationState {
     case done
 }
 
+private extension String {
+    static let generationErrorTitle = String(localized: "Image generation failed")
+    static let generationErrorMessage = String(localized: "Please try again")
+}
+
 @Observable
 final class GeneratedImageStore<Generator, Persistence>: GeneratedImageStoring
 where Generator: Generating,
@@ -150,8 +155,8 @@ where Generator: Generating,
                 }
             } catch {
                 errorInfo = ErrorInfo(
-                    title: "Image generation failed",
-                    message: "Please try again"
+                    title: String.generationErrorTitle,
+                    message: String.generationErrorMessage
                 )
                 Log.shared.info("Image generation error: \(error.localizedDescription)")
             }

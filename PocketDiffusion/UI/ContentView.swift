@@ -15,8 +15,8 @@ struct ContentView: View {
 
         var label: String {
             switch self {
-            case .imageGeneration: "Generate"
-            case .imageGallery: "Gallery"
+            case .imageGeneration: String.Button.generate
+            case .imageGallery: String.Button.gallery
             }
         }
 

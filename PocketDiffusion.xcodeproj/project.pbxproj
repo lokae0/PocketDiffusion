@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3EAF07612F1CC17400B8E144 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 3EAF07602F1CC17400B8E144 /* README.md */; };
 		3EF349EC2F0D079C005720F2 /* StableDiffusion in Frameworks */ = {isa = PBXBuildFile; productRef = 3EF349EB2F0D079C005720F2 /* StableDiffusion */; };
 /* End PBXBuildFile section */
 
@@ -28,6 +29,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3EAF07602F1CC17400B8E144 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		3ED3E7812ED66A190056FC4A /* PocketDiffusion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PocketDiffusion.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3ED3E7902ED66A190056FC4A /* PocketDiffusionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PocketDiffusionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3ED3E79A2ED66A190056FC4A /* PocketDiffusionUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PocketDiffusionUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -81,6 +83,7 @@
 				3ED3E7832ED66A190056FC4A /* PocketDiffusion */,
 				3ED3E7932ED66A190056FC4A /* PocketDiffusionTests */,
 				3ED3E7822ED66A190056FC4A /* Products */,
+				3EAF07602F1CC17400B8E144 /* README.md */,
 			);
 			sourceTree = "<group>";
 		};
@@ -215,6 +218,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3EAF07612F1CC17400B8E144 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -331,6 +335,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
 			};
@@ -388,6 +393,7 @@
 				MTL_FAST_MATH = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
 			};
 			name = Release;

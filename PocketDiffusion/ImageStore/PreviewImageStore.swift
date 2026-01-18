@@ -34,7 +34,7 @@ final class PreviewImageStore: GeneratedImageStoring {
             .init(
                 uiImage: .image(color: .darkGray),
                 settings: .init(
-                    prompt: String.samplePrompt,
+                    prompt: String.Mock.samplePrompt,
                     negativePrompt: "",
                     stepCount: 25,
                     guidanceScale: 11.0,
@@ -57,7 +57,7 @@ final class PreviewImageStore: GeneratedImageStoring {
                 uiImage: .image(color: .gray),
                 settings: .init(
                     prompt: "a giant cat on the moon with bizarre eyes and small hands",
-                    negativePrompt: String.sampleNegativePrompt,
+                    negativePrompt: String.Mock.sampleNegativePrompt,
                     stepCount: 8,
                     guidanceScale: 2.3,
                     seed: 52916723

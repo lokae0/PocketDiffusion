@@ -9,6 +9,16 @@ import SwiftUI
 
 private extension UI {
     static let imageHeight: CGFloat = 512.0
+    static let labeledContentLineLimit: Int = 2
+
+    static let stepCountMin: Double = 1.0
+    static let stepCountMax: Double = 50.0
+
+    static let guidanceScaleMin: Double = 1.0
+    static let guidanceScaleMax: Double = 20.0
+
+    static let seedMin: Double = 0.0
+    static let seedMax = Double(UInt32.max)
 
     enum DoneIndicator {
         static let size: CGFloat = 24.0
@@ -25,6 +35,28 @@ private extension UI {
     enum CurrentStep {
         static let horizontalPadding: CGFloat = -20.0
         static let verticalPadding: CGFloat = -5.0
+    }
+}
+
+private extension String {
+    static let randomizeSeed = String(localized: "Randomize seed")
+
+    static let cancelConfirmation = String(
+        localized: "Are you sure you want to cancel generating?"
+    )
+
+    static let loadingMessages = [
+        String(localized: "Reticulating splines..."),
+        String(localized: "Stealing artist content..."),
+        String(localized: "Don't get mad at the AI, it won't forget you"),
+        String(localized: "Changing Neural Engine oil..."),
+        String(localized: "Implementing Polydactyly..."),
+        String(localized: "Grilling up extra hot dog fingers..."),
+        String(localized: "Attaching limbs to inappropriate places..."),
+    ]
+
+    static func steps(completed: Int, stepCount: Int) -> Self {
+        .init(localized: "Steps completed: \(completed) of \(stepCount)")
     }
 }
 
@@ -50,11 +82,11 @@ struct ImageGenerationView: View {
 
         var title: String {
             switch self {
-            case .prompt: "Prompt"
-            case .negativePrompt: "Negative prompt"
-            case .stepCount: "Step count"
-            case .guidanceScale: "Guidance scale"
-            case .seed: "Seed"
+            case .prompt: String.Settings.prompt
+            case .negativePrompt: String.Settings.negativePrompt
+            case .stepCount: String.Settings.stepCount
+            case .guidanceScale: String.Settings.guidanceScale
+            case .seed: String.Settings.seed
             }
         }
 
@@ -82,10 +114,10 @@ struct ImageGenerationView: View {
 
                     labeledContent(for: .stepCount, value: String(imageStore.stepCount))
 
-                    let guidanceFormat = String(format: "%.1f", arguments: [imageStore.guidanceScale])
+                    let guidanceFormat = String.format(guidanceScale: imageStore.guidanceScale)
                     labeledContent(for: .guidanceScale, value: guidanceFormat)
 
-                    Toggle("Randomize seed", isOn: $imageStore.isSeedRandom)
+                    Toggle(String.randomizeSeed, isOn: $imageStore.isSeedRandom)
                         .tint(UI.tintColor)
 
                     if !imageStore.isSeedRandom {
@@ -127,18 +159,18 @@ private extension ImageGenerationView {
             }
         }
         Button(
-            isGenInProgress ? "Cancel" : "Generate",
+            isGenInProgress ? String.Button.cancel : String.Button.generate,
             role: nil,
             action: isGenInProgress ? cancelAction : imageStore.generateImages
         )
         .controlSize(.large)
         .buttonStyle(.glass)
         .tint(isGenInProgress ? nil : UI.tintColor)
-        .alert("Are you sure you want to cancel generating?", isPresented: $isCancelAlertShown) {
-            Button("Confirm", role: .destructive) {
+        .alert(String.cancelConfirmation, isPresented: $isCancelAlertShown) {
+            Button(String.Button.confirm, role: .destructive) {
                 imageStore.cancelImageGeneration()
             }
-            Button("Nevermind", role: .cancel) {}
+            Button(String.Button.nevermind, role: .cancel) {}
         }
         .onChange(of: imageStore.state) { oldValue, newValue in
             // Hide the alert if generation finishes before user input is received
@@ -165,16 +197,7 @@ private extension ImageGenerationView {
                     isZoomableImageShown = true
                 }
 
-            let loadingMessage = [
-                "Reticulating splines...",
-                "Stealing artist content...",
-                "Don't get mad at the AI, it won't forget you",
-                "Changing Neural Engine oil...",
-                "Implementing Polydactyly...",
-                "Grilling up extra hot dog fingers...",
-                "Attaching limbs to inappropriate places...",
-            ].randomElement() ?? ""
-
+            let loadingMessage = String.loadingMessages.randomElement() ?? ""
             if imageStore.state == .waiting {
                 ProgressView(loadingMessage)
                     .progressViewStyle(CircularProgressViewStyle())
@@ -183,7 +206,11 @@ private extension ImageGenerationView {
 
             let frameSize = UI.DoneIndicator.frameSize(parentSize: previewImageSize)
             if imageStore.state == .receiving, let currentStep = imageStore.currentStep {
-                Text("Steps completed: \(currentStep + 1) of \(imageStore.stepCount)")
+                let stepsCompletedText = String.steps(
+                    completed: currentStep + 1,
+                    stepCount: imageStore.stepCount
+                )
+                Text(stepsCompletedText)
                     .font(.system(.footnote))
                     .background(
                         Rectangle()
@@ -226,7 +253,7 @@ private extension ImageGenerationView {
     @ViewBuilder
     private func labeledContent(for modal: Modal, value: String) -> some View {
         LabeledContent(modal.title, value: value)
-            .lineLimit(2)
+            .lineLimit(UI.labeledContentLineLimit)
             .contentShape(Rectangle())
             .onTapGesture {
                 shownModal = modal
@@ -238,34 +265,34 @@ private extension ImageGenerationView {
         switch modal {
         case .prompt:
             PromptEditView(
-                title: Modal.prompt.title,
+                title: modal.title,
                 text: $imageStore.prompt
             )
         case .negativePrompt:
             PromptEditView(
-                title: Modal.negativePrompt.title,
+                title: modal.title,
                 text: $imageStore.negativePrompt
             )
         case .stepCount:
             NumberEntryView(
-                title: Modal.stepCount.title,
-                min: 1.0,
-                max: 50.0,
+                title: modal.title,
+                min: UI.stepCountMin,
+                max: UI.stepCountMax,
                 number: .fromInt($imageStore.stepCount)
             )
         case .guidanceScale:
             NumberEntryView(
-                title: Modal.guidanceScale.title,
-                min: 1.0,
-                max: 20.0,
+                title: modal.title,
+                min: UI.guidanceScaleMin,
+                max: UI.guidanceScaleMax,
                 isDecimalShown: true,
                 number: $imageStore.guidanceScale
             )
         case .seed:
             NumberEntryView(
-                title: Modal.seed.title,
-                min: 0.0,
-                max: Double(UInt32.max),
+                title: modal.title,
+                min: UI.seedMin,
+                max: UI.seedMax,
                 isSliderEnabled: false,
                 isKeyboardEnabled: true,
                 number: .fromInt($imageStore.seed)

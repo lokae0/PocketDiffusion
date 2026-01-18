@@ -15,7 +15,7 @@ struct GeneratedImage: Identifiable, Hashable, Sendable {
 
     var durationString: String {
         let format = String(format: "%.1f", arguments: [duration])
-        return format + "s"
+        return format + String(localized: "s", comment: "Abbreviation for seconds")
     }
 }
 

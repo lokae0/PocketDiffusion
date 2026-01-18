@@ -125,16 +125,16 @@ private extension NumberEntryView {
                     dismiss()
                 }
             } label: {
-                Label("Cancel", systemImage: UI.Symbol.xmark)
+                Label(String.Button.cancel, systemImage: UI.Symbol.xmark)
             }
-            .alert("Discard changes?", isPresented: $showCancelAlert) {
+            .alert(String.cancelAlertTitle, isPresented: $showCancelAlert) {
                 Button(role: .destructive) {
                     number = originalNumber
                     dismiss()
                 } label: {
-                    Text("Discard")
+                    Text(String.Button.discard)
                 }
-                Button("Cancel", role: .cancel) {}
+                Button(String.Button.cancel, role: .cancel) {}
             }
         }
     }
@@ -145,7 +145,7 @@ private extension NumberEntryView {
             Button {
                 dismiss()
             } label: {
-                Label("Save", systemImage: UI.Symbol.checkmark)
+                Label(String.Button.save, systemImage: UI.Symbol.checkmark)
             }
         }
     }

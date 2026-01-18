@@ -123,7 +123,7 @@ private extension ModalZoomableImageView {
             Button {
                 dismiss()
             } label: {
-                Label("Dismiss", systemImage: UI.Symbol.xmark)
+                Label(String.Button.dismiss, systemImage: UI.Symbol.xmark)
             }
         }
     }
