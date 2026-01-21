@@ -107,21 +107,21 @@ where Generator: Generating,
 
     private let imageGenerator: Generator
     private let persistence: Persistence
+    private let userDefaults: UserDefaults
 
-    private var generationTask: Task<Void, Never>?
-
-    private var userDefaults: UserDefaults {
-        UserDefaults.standard
-    }
+    private(set) var generationTask: Task<Void, Never>?
+    private(set) var persistenceTask: Task<Void, Never>?
 
     init(
         imageGenerator: Generator = ImageGenerator(),
-        persistence: Persistence = FilePersistence()
+        persistence: Persistence = FilePersistence(),
+        userDefaults: UserDefaults = .standard
     ) {
         self.imageGenerator = imageGenerator
         self.persistence = persistence
+        self.userDefaults = userDefaults
 
-        Task {
+        persistenceTask = Task {
             await tryPersistence(restore)
         }
     }
@@ -203,14 +203,14 @@ where Generator: Generating,
 
     func deleteImages(at offsets: IndexSet) {
         storedImages.remove(atOffsets: offsets)
-        Task {
+        persistenceTask = Task {
             await tryPersistence(save)
         }
     }
 
     func moveImages(from source: IndexSet, to destination: Int) {
         storedImages.move(fromOffsets: source, toOffset: destination)
-        Task {
+        persistenceTask = Task {
             await tryPersistence(save)
         }
     }

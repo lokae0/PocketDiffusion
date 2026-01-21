@@ -105,11 +105,12 @@ final actor ImageGenerator: Generating {
                 }
             }
 
-            continuation.onTermination = { termination in
+            continuation.onTermination = { [weak self] termination in
                 switch termination {
                 case .cancelled:
+                    let prefix = self?.loggingPrefix ?? ""
                     Log.shared.currentThread(
-                        self.loggingPrefix + "`continuation.onTermination` canceling generationTask"
+                        prefix + "`continuation.onTermination` canceling generationTask"
                     )
                     generationTask.cancel()
                 case .finished:
