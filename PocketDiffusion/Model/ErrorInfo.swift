@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ErrorInfo: Sendable {
+struct ErrorInfo: Sendable, Equatable {
     let title: String
     let message: String
 }

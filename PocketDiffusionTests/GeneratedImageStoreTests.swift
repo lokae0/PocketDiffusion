@@ -201,6 +201,29 @@ class GeneratedImageStoreTests {
         #expect(await mockPersistence.persistedImages == startImages.reversed())
     }
 
+    // MARK: - Error tests
+
+    @Test func persistenceError() async {
+        mockPersistence = MockPersistence(shouldThrow: true)
+
+        // Calls restore
+        recreateImageStore()
+        await imageStore.persistenceTask?.value
+
+        #expect(imageStore.errorInfo == PersistenceError.restore.defaultInfo)
+    }
+
+    @Test func imageGenerationError() async {
+        mockImageGenerator = MockImageGenerator(shouldError: true)
+        recreateImageStore()
+
+        imageStore.generateImages()
+        await imageStore.generationTask?.value
+
+        #expect(imageStore.errorInfo != nil)
+        #expect(imageStore.generationTask?.isCancelled == true)
+    }
+
     // MARK: - User Defaults tests
 
     @Test func prompt() async {

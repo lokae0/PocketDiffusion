@@ -9,6 +9,8 @@
 
 import UIKit
 
+struct MockError: Error {}
+
 actor MockImageGenerator: Generating {
 
     typealias Generated = (image: UIImage, step: Int)
@@ -46,7 +48,7 @@ actor MockImageGenerator: Generating {
             generateSettings = settings
 
             guard !shouldError else {
-                continuation.finish(throwing: nil)
+                continuation.finish(throwing: MockError())
                 return
             }
             mockResults.forEach {
