@@ -177,9 +177,11 @@ class GeneratedImageStoreTests {
 
     // MARK: - User Defaults tests
 
-    @Test func prompt() {
+    @Test func prompt() async {
         let setPrompt = "A bored tigershark"
-        imageStore.prompt = setPrompt
+        await MainActor.run {
+            imageStore.prompt = setPrompt
+        }
         #expect(userDefaults.object(forKey: .UserDefaultsKeys.prompt) as? String == setPrompt)
 
         let getPrompt = "An excited porpoise"
@@ -187,9 +189,11 @@ class GeneratedImageStoreTests {
         #expect(imageStore.prompt == getPrompt)
     }
 
-    @Test func negativePrompt() {
+    @Test func negativePrompt() async {
         let setNegativePrompt = "Earth, wind"
-        imageStore.negativePrompt = setNegativePrompt
+        await MainActor.run {
+            imageStore.negativePrompt = setNegativePrompt
+        }
         #expect(userDefaults.object(forKey: .UserDefaultsKeys.negativePrompt) as? String == setNegativePrompt)
 
         let getNegativePrompt = "Water, fire"
@@ -197,9 +201,11 @@ class GeneratedImageStoreTests {
         #expect(imageStore.negativePrompt == getNegativePrompt)
     }
 
-    @Test func stepCount() {
+    @Test func stepCount() async {
         let setStepCount = 14
-        imageStore.stepCount = setStepCount
+        await MainActor.run {
+            imageStore.stepCount = setStepCount
+        }
         #expect(userDefaults.object(forKey: .UserDefaultsKeys.stepCount) as? Int == setStepCount)
 
         let getStepCount = 7
@@ -207,9 +213,11 @@ class GeneratedImageStoreTests {
         #expect(imageStore.stepCount == getStepCount)
     }
 
-    @Test func guidanceScale() {
+    @Test func guidanceScale() async {
         let setScale = 5.7
-        imageStore.guidanceScale = setScale
+        await MainActor.run {
+            imageStore.guidanceScale = setScale
+        }
         #expect(userDefaults.object(forKey: .UserDefaultsKeys.guidanceScale) as? Double == setScale)
 
         let getScale = 12.2
@@ -217,9 +225,11 @@ class GeneratedImageStoreTests {
         #expect(imageStore.guidanceScale == getScale)
     }
 
-    @Test func seed() {
+    @Test func seed() async {
         let setSeed = 123456
-        imageStore.seed = setSeed
+        await MainActor.run {
+            imageStore.seed = setSeed
+        }
         #expect(userDefaults.object(forKey: .UserDefaultsKeys.seed) as? Int == setSeed)
 
         let getSeed = 78910
@@ -227,9 +237,12 @@ class GeneratedImageStoreTests {
         #expect(imageStore.seed == getSeed)
     }
 
-    @Test func isSeedRandom() {
-        imageStore.isSeedRandom = true
+    @Test func isSeedRandom() async {
+        await MainActor.run {
+            imageStore.isSeedRandom = true
+        }
         #expect(userDefaults.object(forKey: .UserDefaultsKeys.isSeedRandom) as? Bool == true)
+
         userDefaults.set(false, forKey: .UserDefaultsKeys.isSeedRandom)
         #expect(imageStore.isSeedRandom == false)
     }
