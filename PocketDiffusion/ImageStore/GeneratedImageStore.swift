@@ -139,45 +139,13 @@ where Generator: Generating,
             seed: isSeedRandom ? UInt32.random(in: 0..<UInt32.max) : UInt32(seed),
         )
         generationTask = Task {
-            do {
-                for await generated in try await imageGenerator.generate(with: settings) {
-                    guard let result = generated as? (image: UIImage, step: Int) else {
-                        Log.shared.info("Unexpected generation type!!")
-                        continue
-                    }
-                    Log.shared.currentThread(
-                        "Receiving preview images",
-                        isEnabled: false
-                    )
-                    state = .receiving
-                    previewImage = result.image
-                    currentStep = result.step
-                }
-            } catch {
-                errorInfo = ErrorInfo(
-                    title: String.generationErrorTitle,
-                    message: String.generationErrorMessage
-                )
-                Log.shared.info("Image generation error: \(error.localizedDescription)")
-            }
+            await generateAndConsumeImages(with: settings)
 
             guard !Task.isCancelled else {
                 Timer.shared.stopTimer(type: .imageGeneration, shouldLog: false)
                 return
             }
-            let duration = Timer.shared.stopTimer(type: .imageGeneration)
-            state = .done
-            currentStep = nil
-
-            // Last preview image is the final result
-            storedImages.append(
-                GeneratedImage(
-                    uiImage: previewImage ?? .placeholder,
-                    settings: settings,
-                    duration: duration
-                )
-            )
-            await tryPersistence(save)
+            await finishGeneration(with: settings)
         }
     }
 
@@ -213,6 +181,52 @@ where Generator: Generating,
         persistenceTask = Task {
             await tryPersistence(save)
         }
+    }
+}
+
+// MARK: - Internal and private
+
+extension GeneratedImageStore {
+
+    // Internal helper to support unit testing
+    func generateAndConsumeImages(with settings: GenerationSettings) async {
+        do {
+            for await generated in try await imageGenerator.generate(with: settings) {
+                guard let result = generated as? (image: UIImage, step: Int) else {
+                    Log.shared.info("Unexpected generation type!!")
+                    continue
+                }
+                Log.shared.currentThread(
+                    "Receiving preview images",
+                    isEnabled: false
+                )
+                state = .receiving
+                previewImage = result.image
+                currentStep = result.step
+            }
+        } catch {
+            errorInfo = ErrorInfo(
+                title: String.generationErrorTitle,
+                message: String.generationErrorMessage
+            )
+            Log.shared.info("Image generation error: \(error.localizedDescription)")
+        }
+    }
+
+    private func finishGeneration(with settings: GenerationSettings) async {
+        let duration = Timer.shared.stopTimer(type: .imageGeneration)
+        state = .done
+        currentStep = nil
+
+        // Last preview image is the final result
+        storedImages.append(
+            GeneratedImage(
+                uiImage: previewImage ?? .placeholder,
+                settings: settings,
+                duration: duration
+            )
+        )
+        await tryPersistence(save)
     }
 
     private func save() async throws(PersistenceError) {

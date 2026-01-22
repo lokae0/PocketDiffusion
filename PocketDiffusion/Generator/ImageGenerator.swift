@@ -25,6 +25,10 @@ final actor ImageGenerator: Generating {
 
     private let loggingPrefix: String = "IG - "
 
+    private var cancellationMessage: String {
+        loggingPrefix + "Generation cancelled"
+    }
+
     init() {
         let fatalLoadMessage = loggingPrefix + "Unable to load Stable Diffusion model resources"
 
@@ -61,15 +65,7 @@ final actor ImageGenerator: Generating {
 
     func generate(with settings: GenerationSettings) throws -> AsyncStream<Generated> {
         AsyncStream { continuation in
-            var config = StableDiffusionPipeline.Configuration(prompt: settings.prompt)
-            config.negativePrompt = settings.negativePrompt
-            config.stepCount = settings.stepCount
-            config.guidanceScale = Float(settings.guidanceScale)
-            config.seed = settings.seed
-            config.useDenoisedIntermediates = true
-            config.schedulerType = .dpmSolverMultistepScheduler
-
-            let cancellationMessage = loggingPrefix + "Generation cancelled"
+            let config = configuration(for: settings)
 
             let generationTask = Task {
                 await Timer.shared.stopTimer(type: .awaitingPipeline)
@@ -83,51 +79,80 @@ final actor ImageGenerator: Generating {
                     loggingPrefix + "Calling `pipeline.generateImages` with settings: \(settings)"
                 )
                 await Timer.shared.startTimer(type: .imageGeneration)
-                let _ = try pipeline.generateImages(configuration: config) { progress in
-                    // Handle cancellations that occur during image generation
-                    guard !Task.isCancelled else {
-                        Log.shared.info(cancellationMessage)
-                        continuation.finish()
-                        return false
-                    }
-                    // Return stream of images as they're generated
-                    if let currentImage = progress.currentImages.compactMap({ $0 }).last {
-                        Log.shared.info(loggingPrefix + "Step: \(progress.step)")
-                        let image = UIImage(cgImage: currentImage)
-                        continuation.yield((image, progress.step))
-                    }
-                    // Check if we're done
-                    if progress.step == progress.stepCount - 1 {
-                        Log.shared.info(loggingPrefix + "Finished generating")
-                        continuation.finish()
-                    }
-                    return true
-                }
+                try await invokePipeline(with: config, continuation: continuation)
             }
 
             continuation.onTermination = { [weak self] termination in
-                switch termination {
-                case .cancelled:
-                    let prefix = self?.loggingPrefix ?? ""
-                    Log.shared.currentThread(
-                        prefix + "`continuation.onTermination` canceling generationTask"
-                    )
-                    generationTask.cancel()
-                case .finished:
-                    break
-                @unknown default:
-                    break
-                }
+                self?.cancel(task: generationTask, upon: termination)
             }
         }
     }
+}
 
-    private func prewarm() async {
+private extension ImageGenerator {
+
+    func prewarm() async {
         do {
             Log.shared.currentThread("Prewarming started")
             try pipeline.prewarmResources()
         } catch {
             Log.shared.info("Prewarming failed!!")
+        }
+    }
+
+    func configuration(
+        for settings: GenerationSettings
+    ) -> StableDiffusionPipeline.Configuration {
+        var config = StableDiffusionPipeline.Configuration(prompt: settings.prompt)
+        config.negativePrompt = settings.negativePrompt
+        config.stepCount = settings.stepCount
+        config.guidanceScale = Float(settings.guidanceScale)
+        config.seed = settings.seed
+        config.useDenoisedIntermediates = true
+        config.schedulerType = .dpmSolverMultistepScheduler
+        return config
+    }
+
+    func invokePipeline(
+        with config: StableDiffusionPipeline.Configuration,
+        continuation: AsyncStream<Generated>.Continuation
+    ) async throws {
+        let _ = try pipeline.generateImages(configuration: config) { progress in
+            // Handle cancellations that occur during image generation
+            guard !Task.isCancelled else {
+                Log.shared.info(cancellationMessage)
+                continuation.finish()
+                return false
+            }
+            // Return stream of images as they're generated
+            if let currentImage = progress.currentImages.compactMap({ $0 }).last {
+                Log.shared.info(loggingPrefix + "Step: \(progress.step)")
+                let image = UIImage(cgImage: currentImage)
+                continuation.yield((image, progress.step))
+            }
+            // Check if we're done
+            if progress.step == progress.stepCount - 1 {
+                Log.shared.info(loggingPrefix + "Finished generating")
+                continuation.finish()
+            }
+            return true
+        }
+    }
+
+    nonisolated func cancel(
+        task: Task<(), any Error>,
+        upon termination: (AsyncStream<Generated>.Continuation.Termination)
+    ) {
+        switch termination {
+        case .cancelled:
+            Log.shared.currentThread(
+                loggingPrefix + "`continuation.onTermination` canceling generationTask"
+            )
+            task.cancel()
+        case .finished:
+            break
+        @unknown default:
+            break
         }
     }
 }
