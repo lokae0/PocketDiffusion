@@ -35,15 +35,13 @@ class GeneratedImageStoreTests {
         userDefaults.removePersistentDomain(forName: #file)
     }
 
+    // MARK: - Functionality tests
+
     @Test func initialization() async {
         let expectedImages = [GeneratedImage.mockImageTwo]
         mockPersistence = MockPersistence(persistedImages: expectedImages)
 
-        imageStore = GeneratedImageStore(
-            imageGenerator: mockImageGenerator,
-            persistence: mockPersistence,
-            userDefaults: userDefaults
-        )
+        recreateImageStore()
 
         #expect(imageStore.state == .idle)
         #expect(imageStore.currentStep == nil)
@@ -54,7 +52,7 @@ class GeneratedImageStoreTests {
         #expect(imageStore.storedImages == expectedImages)
     }
 
-    @Test func generateImages() async throws {
+    @Test func generateImageSetup() async throws {
         let expectedSettings = GeneratedImage.mockImageOne.settings
 
         imageStore.prompt = expectedSettings.prompt
@@ -64,46 +62,80 @@ class GeneratedImageStoreTests {
         imageStore.seed = Int(expectedSettings.seed)
         imageStore.isSeedRandom = false
 
+        imageStore.update(previewImage: UIImage(), shouldResetState: false)
+
         imageStore.generateImages()
         #expect(imageStore.state == .waiting)
+        #expect(imageStore.previewImage == nil)
+        #expect(imageStore.generationTask != nil)
 
-        let expectedImage = UIImage()
-        let expectedStep = 1
-
-        // Simulate generation streaming output
-        await mockImageGenerator.generationContinuation?.yield(
-            (image: expectedImage, step: expectedStep)
-        )
+        await imageStore.generationTask?.value
 
         let generateSettings = try #require(await mockImageGenerator.generateSettings)
         #expect(generateSettings == expectedSettings)
+    }
 
-//        #expect(imageStore.state == .receiving)
-//        #expect(imageStore.previewImage == expectedImage)
-//        #expect(imageStore.currentStep == expectedStep)
+    @Test func consumeImages() async {
+        let testImage = UIImage()
+        let results = [(image: testImage, step: 1)]
+        mockImageGenerator = MockImageGenerator(mockResults: results)
 
-        // End streaming
-        await mockImageGenerator.generationContinuation?.finish()
+        // Simulates generation in progress
+        await imageStore.consumeGeneratedImages(
+            mockImageGenerator.generate(with: GeneratedImage.mockImageOne.settings)
+        )
+        #expect(imageStore.previewImage == testImage)
+        #expect(imageStore.currentStep == 1)
+        #expect(imageStore.state == .receiving)
+    }
+
+    @Test func finishGeneration() async throws {
+        let expectedImage = UIImage()
+        let results = [(image: expectedImage, step: 1)]
+        mockImageGenerator = MockImageGenerator(mockResults: results)
+        recreateImageStore()
+
+        imageStore.generateImages()
         await imageStore.generationTask?.value
 
         #expect(imageStore.state == .done)
         #expect(imageStore.currentStep == nil)
 
+        let expectedSettings = await mockImageGenerator.generateSettings
+
         let finalImage = try #require(imageStore.storedImages.first)
-//        #expect(finalImage.uiImage == expectedImage)
+        #expect(finalImage.uiImage == expectedImage)
         #expect(finalImage.settings == expectedSettings)
 
         #expect(await mockPersistence.persistedImages == [finalImage])
     }
 
-    @Test func cancelGeneration() async throws {
+    @Test func cancelGenerationTask() async throws {
         imageStore.generateImages()
-        imageStore.cancelImageGeneration()
 
-        // Add one round of iteration to test things get reset correctly
+        imageStore.cancelImageGeneration()
 
         let generationTask = try #require(imageStore.generationTask)
         #expect(generationTask.isCancelled)
+
+        // Ensure task cancellation propagates to the underlying image generator
+        await generationTask.value
+        #expect(await mockImageGenerator.isCancelled)
+    }
+
+    @Test func cancelGenerationState() async {
+        let testImage = UIImage()
+        let results = [(image: testImage, step: 1)]
+        mockImageGenerator = MockImageGenerator(mockResults: results)
+
+        // Simulates generation in progress
+        await imageStore.consumeGeneratedImages(
+            mockImageGenerator.generate(with: GeneratedImage.mockImageOne.settings)
+        )
+
+        imageStore.cancelImageGeneration()
+
+        #expect(imageStore.previewImage == nil)
         #expect(imageStore.currentStep == nil)
         #expect(imageStore.state == .idle)
     }
@@ -114,12 +146,12 @@ class GeneratedImageStoreTests {
         (image: UIImage(), shouldResetState: true),
         (image: nil, shouldResetState: false),
     ], [
-        (isImagePresent: true, state: GenerationState.idle),
-        (isImagePresent: false, state: GenerationState.waiting),
+        (isImageExpected: true, expectedState: GenerationState.idle),
+        (isImageExpected: false, expectedState: GenerationState.waiting),
     ]))
     func updatePreview(
         inputs: (image: UIImage?, shouldResetState: Bool),
-        expectations: (isImagePresent: Bool, state: GenerationState)
+        expectations: (isImageExpected: Bool, expectedState: GenerationState)
     ) {
         // Force waiting state
         imageStore.generateImages()
@@ -128,9 +160,9 @@ class GeneratedImageStoreTests {
             previewImage: inputs.image,
             shouldResetState: inputs.shouldResetState
         )
-        let expectedImage = expectations.isImagePresent ? inputs.image : nil
+        let expectedImage = expectations.isImageExpected ? inputs.image : nil
         #expect(imageStore.previewImage == expectedImage)
-        #expect(imageStore.state == expectations.state)
+        #expect(imageStore.state == expectations.expectedState)
     }
 
     @Test func deleteImages() async {
@@ -138,11 +170,8 @@ class GeneratedImageStoreTests {
         let startImages: [GeneratedImage] = [.mockImageOne, .mockImageTwo]
         mockPersistence = MockPersistence(persistedImages: startImages)
 
-        imageStore = GeneratedImageStore(
-            imageGenerator: mockImageGenerator,
-            persistence: mockPersistence,
-            userDefaults: userDefaults
-        )
+        // Load images
+        recreateImageStore()
         await imageStore.persistenceTask?.value
 
         let expectedImages = Array(startImages.dropFirst())
@@ -160,11 +189,8 @@ class GeneratedImageStoreTests {
         let startImages: [GeneratedImage] = [.mockImageOne, .mockImageTwo]
         mockPersistence = MockPersistence(persistedImages: startImages)
 
-        imageStore = GeneratedImageStore(
-            imageGenerator: mockImageGenerator,
-            persistence: mockPersistence,
-            userDefaults: userDefaults
-        )
+        // Load images
+        recreateImageStore()
         await imageStore.persistenceTask?.value
 
         imageStore.moveImages(from: IndexSet(integer: 0), to: 2)
@@ -239,11 +265,22 @@ class GeneratedImageStoreTests {
 
     @Test func isSeedRandom() async {
         await MainActor.run {
-            imageStore.isSeedRandom = true
+            imageStore.isSeedRandom = false
         }
-        #expect(userDefaults.object(forKey: .UserDefaultsKeys.isSeedRandom) as? Bool == true)
+        #expect(userDefaults.object(forKey: .UserDefaultsKeys.isSeedRandom) as? Bool == false)
 
-        userDefaults.set(false, forKey: .UserDefaultsKeys.isSeedRandom)
-        #expect(imageStore.isSeedRandom == false)
+        userDefaults.set(true, forKey: .UserDefaultsKeys.isSeedRandom)
+        #expect(imageStore.isSeedRandom == true)
+    }
+}
+
+private extension GeneratedImageStoreTests {
+
+    func recreateImageStore() {
+        imageStore = GeneratedImageStore(
+            imageGenerator: mockImageGenerator,
+            persistence: mockPersistence,
+            userDefaults: userDefaults
+        )
     }
 }

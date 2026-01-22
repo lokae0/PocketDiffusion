@@ -142,7 +142,6 @@ where Generator: Generating,
             await consumeGeneratedImages(
                 imageGenerator.generate(with: settings)
             )
-
             guard !Task.isCancelled else {
                 Timer.shared.stopTimer(type: .imageGeneration, shouldLog: false)
                 return

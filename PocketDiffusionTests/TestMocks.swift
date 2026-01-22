@@ -13,19 +13,46 @@ actor MockImageGenerator: Generating {
 
     typealias Generated = (image: UIImage, step: Int)
 
-    /// Allows granular control over simulated generation progress during testing
-    var generationContinuation: GenerationStream.Continuation?
+    /// Values to be emitted upon calling `generate`
+    var mockResults: [Generated]
+
+    /// Will simulate an error when true
+    var shouldError: Bool
 
     /// Was the `AsyncStream` returned by `generate(with:)` canceled
-    var isCancelled: Bool = false
+    private(set) var isCancelled: Bool = false
 
     /// The settings that `generate(:)` was called with
-    var generateSettings: GenerationSettings?
+    private(set) var generateSettings: GenerationSettings?
+
+    /// Creates a mock image generator for tests.
+    ///
+    /// - Parameters:
+    ///   - mockResults: The sequence of `(image, step)` tuples that will be emitted
+    ///     in order when `generate(with:)` is called. Defaults to an empty array,
+    ///     which yields nothing and immediately finishes.
+    ///   - shouldError: When `true`, the mock can be configured by tests to simulate
+    ///     an error path. Defaults to `false`.
+    init(
+        mockResults: [Generated] = [],
+        shouldError: Bool = false
+    ) {
+        self.mockResults = mockResults
+        self.shouldError = shouldError
+    }
 
     func generate(with settings: GenerationSettings) -> GenerationStream {
         AsyncThrowingStream { continuation in
             generateSettings = settings
-            generationContinuation = continuation
+
+            guard !shouldError else {
+                continuation.finish(throwing: nil)
+                return
+            }
+            mockResults.forEach {
+                continuation.yield($0)
+            }
+            continuation.finish()
 
             continuation.onTermination = { [weak self] termination in
                 if case .cancelled = termination {
