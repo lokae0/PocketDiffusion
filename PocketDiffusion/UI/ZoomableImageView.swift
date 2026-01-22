@@ -15,7 +15,7 @@ private extension UI {
 
 struct ZoomableImageView: View {
 
-    var uiImage: UIImage
+    var uiImage: UIImage?
 
     @State private var currentScale: CGFloat = 1.0
     @State private var finalScale: CGFloat = 1.0
@@ -27,7 +27,7 @@ struct ZoomableImageView: View {
 
     var body: some View {
         VStack(alignment: .center) {
-            Image(uiImage: uiImage)
+            Image(uiImage: uiImage ?? .placeholder)
                 .resizable()
                 .scaledToFit()
                 .scaleEffect(currentScale)
@@ -101,7 +101,7 @@ struct ZoomableImageView: View {
 
 struct ModalZoomableImageView: View {
 
-    var uiImage: UIImage
+    var uiImage: UIImage?
 
     @Environment(\.dismiss) private var dismiss
 

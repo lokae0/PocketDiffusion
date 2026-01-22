@@ -183,7 +183,7 @@ private extension ImageGenerationView {
     @ViewBuilder
     var previewImage: some View {
         ZStack {
-            Image(uiImage: imageStore.previewImage)
+            Image(uiImage: imageStore.previewImage ?? .placeholder)
                 .resizable()
                 .scaledToFit()
                 .cornerRadius(UI.cornerRadius)

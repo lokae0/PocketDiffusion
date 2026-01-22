@@ -56,6 +56,15 @@ extension String {
         static let gallery = String(localized: "Gallery")
     }
 
+    enum UserDefaultsKeys {
+        static let prompt = "prompt"
+        static let negativePrompt = "negativePrompt"
+        static let stepCount = "stepCount"
+        static let guidanceScale = "guidanceScale"
+        static let seed = "seed"
+        static let isSeedRandom = "isSeedRandom"
+    }
+
     static func format(guidanceScale: Double) -> String {
         .init(format: "%.1f", arguments: [guidanceScale])
     }

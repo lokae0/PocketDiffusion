@@ -32,8 +32,8 @@ protocol GeneratedImageStoring {
     /// Should the seed be randomized
     var isSeedRandom: Bool { get set }
 
-    /// Updates as previews are generated. Starts with a placeholder
-    var previewImage: UIImage { get }
+    /// Updates as previews are generated
+    var previewImage: UIImage? { get }
 
     /// Current progress step while generating images
     var currentStep: Int? { get }

@@ -19,7 +19,7 @@ final class PreviewImageStore: GeneratedImageStoring {
     var seed: Int = 0
     var isSeedRandom: Bool = true
 
-    var previewImage: UIImage = .placeholder
+    var previewImage: UIImage? = .placeholder
 
     var currentStep: Int?
 

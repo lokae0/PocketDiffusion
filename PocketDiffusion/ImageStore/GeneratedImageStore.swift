@@ -35,71 +35,71 @@ where Generator: Generating,
     var prompt: String {
         get {
             access(keyPath: \.prompt)
-            return userDefaults.string(forKey: "prompt") ?? ""
+            return userDefaults.string(forKey: .UserDefaultsKeys.prompt) ?? ""
         }
         set {
             withMutation(keyPath: \.prompt) {
-                userDefaults.setValue(newValue, forKey: "prompt")
+                userDefaults.setValue(newValue, forKey: .UserDefaultsKeys.prompt)
             }
         }
     }
     var negativePrompt: String {
         get {
             access(keyPath: \.negativePrompt)
-            return userDefaults.string(forKey: "negativePrompt") ?? ""
+            return userDefaults.string(forKey: .UserDefaultsKeys.negativePrompt) ?? ""
         }
         set {
             withMutation(keyPath: \.negativePrompt) {
-                userDefaults.setValue(newValue, forKey: "negativePrompt")
+                userDefaults.setValue(newValue, forKey: .UserDefaultsKeys.negativePrompt)
             }
         }
     }
     var stepCount: Int {
         get {
             access(keyPath: \.stepCount)
-            return userDefaults.object(forKey: "stepCount") as? Int ?? 25
+            return userDefaults.object(forKey: .UserDefaultsKeys.stepCount) as? Int ?? 25
         }
         set {
             withMutation(keyPath: \.stepCount) {
-                userDefaults.setValue(newValue, forKey: "stepCount")
+                userDefaults.setValue(newValue, forKey: .UserDefaultsKeys.stepCount)
             }
         }
     }
     var guidanceScale: Double {
         get {
             access(keyPath: \.guidanceScale)
-            return userDefaults.object(forKey: "guidanceScale") as? Double ?? 11
+            return userDefaults.object(forKey: .UserDefaultsKeys.guidanceScale) as? Double ?? 11
         }
         set {
             withMutation(keyPath: \.guidanceScale) {
-                userDefaults.setValue(newValue, forKey: "guidanceScale")
+                userDefaults.setValue(newValue, forKey: .UserDefaultsKeys.guidanceScale)
             }
         }
     }
     var seed: Int {
         get {
             access(keyPath: \.seed)
-            return userDefaults.object(forKey: "seed") as? Int ?? 0
+            return userDefaults.object(forKey: .UserDefaultsKeys.seed) as? Int ?? 0
         }
         set {
             withMutation(keyPath: \.guidanceScale) {
-                userDefaults.setValue(newValue, forKey: "seed")
+                userDefaults.setValue(newValue, forKey: .UserDefaultsKeys.seed)
             }
         }
     }
     var isSeedRandom: Bool {
         get {
             access(keyPath: \.isSeedRandom)
-            return userDefaults.object(forKey: "isSeedRandom") as? Bool ?? true
+            return userDefaults.object(forKey: .UserDefaultsKeys.isSeedRandom) as? Bool ?? true
         }
         set {
             withMutation(keyPath: \.isSeedRandom) {
-                userDefaults.setValue(newValue, forKey: "isSeedRandom")
+                userDefaults.setValue(newValue, forKey: .UserDefaultsKeys.isSeedRandom)
             }
         }
     }
 
-    private(set) var previewImage: UIImage = .placeholder
+    private(set) var previewImage: UIImage?
     private(set) var currentStep: Int?
 
     private(set) var storedImages: [GeneratedImage] = []
@@ -128,7 +128,7 @@ where Generator: Generating,
 
     func generateImages() {
         state = .waiting
-        previewImage = .placeholder
+        previewImage = nil
         Timer.shared.startTimer(type: .awaitingPipeline)
 
         let settings = GenerationSettings(
@@ -172,7 +172,7 @@ where Generator: Generating,
             // Last preview image is the final result
             storedImages.append(
                 GeneratedImage(
-                    uiImage: previewImage,
+                    uiImage: previewImage ?? .placeholder,
                     settings: settings,
                     duration: duration
                 )
@@ -183,7 +183,7 @@ where Generator: Generating,
 
     func cancelImageGeneration() {
         generationTask?.cancel()
-        previewImage = .placeholder
+        previewImage = nil
         currentStep = nil
         state = .idle
 
@@ -194,7 +194,7 @@ where Generator: Generating,
         if let previewImage {
             self.previewImage = previewImage
         } else {
-            self.previewImage = .placeholder
+            self.previewImage = nil
         }
         if shouldResetState {
             state = .idle

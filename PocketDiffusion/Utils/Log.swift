@@ -7,7 +7,6 @@
 
 import Foundation
 
-// TODO: implement swift-dependencies for DI
 nonisolated final class Log: Sendable {
 
     static let shared = Log()

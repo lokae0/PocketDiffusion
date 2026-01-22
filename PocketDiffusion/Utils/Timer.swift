@@ -8,7 +8,6 @@
 import Foundation
 import StableDiffusion
 
-// TODO: implement swift-dependencies for DI
 final class Timer {
 
     static let shared = Timer()
