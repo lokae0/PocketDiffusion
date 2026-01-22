@@ -139,7 +139,9 @@ where Generator: Generating,
             seed: isSeedRandom ? UInt32.random(in: 0..<UInt32.max) : UInt32(seed),
         )
         generationTask = Task {
-            await generateAndConsumeImages(with: settings)
+            await consumeGeneratedImages(
+                imageGenerator.generate(with: settings)
+            )
 
             guard !Task.isCancelled else {
                 Timer.shared.stopTimer(type: .imageGeneration, shouldLog: false)
@@ -189,9 +191,11 @@ where Generator: Generating,
 extension GeneratedImageStore {
 
     // Internal helper to support unit testing
-    func generateAndConsumeImages(with settings: GenerationSettings) async {
+    func consumeGeneratedImages<Generated>(
+        _ stream: AsyncThrowingStream<Generated, Error>
+    ) async {
         do {
-            for await generated in try await imageGenerator.generate(with: settings) {
+            for try await generated in stream {
                 guard let result = generated as? (image: UIImage, step: Int) else {
                     Log.shared.info("Unexpected generation type!!")
                     continue
@@ -205,6 +209,8 @@ extension GeneratedImageStore {
                 currentStep = result.step
             }
         } catch {
+            cancelImageGeneration()
+
             errorInfo = ErrorInfo(
                 title: String.generationErrorTitle,
                 message: String.generationErrorMessage

@@ -14,7 +14,7 @@ actor MockImageGenerator: Generating {
     typealias Generated = (image: UIImage, step: Int)
 
     /// Allows granular control over simulated generation progress during testing
-    var generationContinuation: AsyncStream<Generated>.Continuation?
+    var generationContinuation: GenerationStream.Continuation?
 
     /// Was the `AsyncStream` returned by `generate(with:)` canceled
     var isCancelled: Bool = false
@@ -22,8 +22,8 @@ actor MockImageGenerator: Generating {
     /// The settings that `generate(:)` was called with
     var generateSettings: GenerationSettings?
 
-    func generate(with settings: GenerationSettings) throws -> AsyncStream<Generated> {
-        AsyncStream { continuation in
+    func generate(with settings: GenerationSettings) -> GenerationStream {
+        AsyncThrowingStream { continuation in
             generateSettings = settings
             generationContinuation = continuation
 
