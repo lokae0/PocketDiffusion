@@ -82,7 +82,7 @@ where Generator: Generating,
             return userDefaults.object(forKey: .UserDefaultsKeys.seed) as? Int ?? 0
         }
         set {
-            withMutation(keyPath: \.guidanceScale) {
+            withMutation(keyPath: \.seed) {
                 userDefaults.setValue(newValue, forKey: .UserDefaultsKeys.seed)
             }
         }
