@@ -75,8 +75,8 @@ actor FilePersistence: Persisting {
                 attributes: nil
             )
             let data = try JSONEncoder().encode(model)
-            // Overwrites file if it already exists
-            fileManager.createFile(atPath: fileUrl.path, contents: data)
+            // Correctly overwrites file if it already exists
+            try data.write(to: fileUrl, options: .atomic)
             Log.shared.info("Images successfully saved to disk")
         } catch {
             Log.shared.info("Error while saving: \(error.localizedDescription)")
