@@ -75,6 +75,42 @@ class GeneratedImageStoreTests {
         #expect(generateSettings == expectedSettings)
     }
 
+    @Test(arguments: [
+        (seed: -1, expected: UInt32(0)),
+        (seed: Int(UInt32.max) + 1, expected: UInt32.max),
+    ])
+    func seedClamping(seed: Int, expected: UInt32) async throws {
+        imageStore.seed = seed
+        imageStore.isSeedRandom = false
+
+        imageStore.generateImages()
+        await imageStore.generationTask?.value
+
+        let generateSettings = try #require(await mockImageGenerator.generateSettings)
+        #expect(generateSettings.seed == expected)
+    }
+
+    @Test func randomSeedUsesGenerator() async throws {
+        let mockRandomSeed: UInt32 = 424242
+        let storedSeed = 7
+
+        imageStore = GeneratedImageStore(
+            imageGenerator: mockImageGenerator,
+            persistence: mockPersistence,
+            userDefaults: userDefaults,
+            seedGenerator: { mockRandomSeed }
+        )
+
+        imageStore.seed = storedSeed
+        imageStore.isSeedRandom = true
+
+        imageStore.generateImages()
+        await imageStore.generationTask?.value
+
+        let generateSettings = try #require(await mockImageGenerator.generateSettings)
+        #expect(generateSettings.seed == mockRandomSeed)
+    }
+
     @Test func consumeImages() async {
         let testImage = UIImage()
         let results = [(image: testImage, step: 1)]

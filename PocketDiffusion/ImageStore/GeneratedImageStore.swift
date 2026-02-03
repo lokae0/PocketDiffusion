@@ -28,7 +28,8 @@ private extension String {
 final class GeneratedImageStore<Generator, Persistence>: GeneratedImageStoring
 where Generator: Generating,
       Persistence: Persisting,
-      Persistence.Model == [GeneratedImage]
+      Persistence.Model == [GeneratedImage],
+      Generator.Generated == (image: UIImage, step: Int)
 {
     private(set) var state: GenerationState = .idle
 
@@ -108,6 +109,7 @@ where Generator: Generating,
     private let imageGenerator: Generator
     private let persistence: Persistence
     private let userDefaults: UserDefaults
+    private let seedGenerator: () -> UInt32
 
     private(set) var generationTask: Task<Void, Never>?
     private(set) var persistenceTask: Task<Void, Never>?
@@ -115,11 +117,13 @@ where Generator: Generating,
     init(
         imageGenerator: Generator = ImageGenerator(),
         persistence: Persistence = FilePersistence(),
-        userDefaults: UserDefaults = .standard
+        userDefaults: UserDefaults = .standard,
+        seedGenerator: @escaping () -> UInt32 = { UInt32.random(in: 0..<UInt32.max) }
     ) {
         self.imageGenerator = imageGenerator
         self.persistence = persistence
         self.userDefaults = userDefaults
+        self.seedGenerator = seedGenerator
 
         persistenceTask = Task {
             await tryPersistence(restore)
@@ -136,7 +140,7 @@ where Generator: Generating,
             negativePrompt: negativePrompt,
             stepCount: stepCount,
             guidanceScale: guidanceScale,
-            seed: isSeedRandom ? UInt32.random(in: 0..<UInt32.max) : UInt32(seed),
+            seed: isSeedRandom ? seedGenerator() : UInt32(clamping: seed),
         )
         generationTask = Task {
             await consumeGeneratedImages(
@@ -190,22 +194,18 @@ where Generator: Generating,
 extension GeneratedImageStore {
 
     // Internal helper to support unit testing
-    func consumeGeneratedImages<Generated>(
-        _ stream: AsyncThrowingStream<Generated, Error>
+    func consumeGeneratedImages(
+        _ stream: AsyncThrowingStream<Generator.Generated, Error>
     ) async {
         do {
             for try await generated in stream {
-                guard let result = generated as? (image: UIImage, step: Int) else {
-                    Log.shared.info("Unexpected generation type!!")
-                    continue
-                }
                 Log.shared.currentThread(
                     "Receiving preview images",
                     isEnabled: false
                 )
                 state = .receiving
-                previewImage = result.image
-                currentStep = result.step
+                previewImage = generated.image
+                currentStep = generated.step
             }
         } catch {
             cancelImageGeneration()
