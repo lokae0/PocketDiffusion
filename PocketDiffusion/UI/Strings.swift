@@ -26,7 +26,7 @@ extension String {
 
         static func displayLabel(guidance: Double) -> String {
             let guidanceFormat = format(guidanceScale: guidance)
-            return .init("Guidance scale: \(guidanceFormat)")
+            return .init(localized: "Guidance scale: \(guidanceFormat)")
         }
 
         static func displayLabel(seed: UInt32) -> String {
